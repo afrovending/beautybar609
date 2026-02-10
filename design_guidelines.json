@@ -1,0 +1,163 @@
+{
+  "identity": {
+    "name": "BeautyBar609",
+    "tagline": "GLOW FROM LASHES TO TIPS",
+    "tone": "Luxury, Exclusive, Precise, Pampered, Editorial",
+    "archetype": "JEWEL & LUXURY",
+    "theme_mode": "dark"
+  },
+  "typography": {
+    "primary_font": "Playfair Display",
+    "secondary_font": "Manrope",
+    "font_weights": {
+      "heading": "font-medium",
+      "body": "font-light",
+      "accent": "font-bold"
+    },
+    "installation": {
+      "google_fonts": "https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    },
+    "usage": {
+      "h1": "font-serif text-5xl md:text-7xl tracking-tight leading-tight text-gold-100",
+      "h2": "font-serif text-3xl md:text-5xl tracking-tight text-gold-200",
+      "h3": "font-serif text-2xl md:text-3xl tracking-normal text-white",
+      "body": "font-sans text-base md:text-lg text-neutral-300 leading-relaxed",
+      "caption": "font-sans text-xs uppercase tracking-[0.2em] text-gold-400"
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": {
+        "base": "#050505",
+        "surface": "#0F0F0F",
+        "highlight": "#1A1A1A"
+      },
+      "gold": {
+        "100": "#F9F1D8",
+        "200": "#F0E1B9",
+        "300": "#E6C975",
+        "400": "#D4AF37",
+        "500": "#B4942B",
+        "600": "#8C7321",
+        "gradient": "linear-gradient(135deg, #D4AF37 0%, #F8E79C 50%, #B4942B 100%)"
+      },
+      "neutral": {
+        "50": "#FAFAFA",
+        "900": "#171717"
+      },
+      "semantic": {
+        "primary": "#D4AF37",
+        "secondary": "#1A1A1A",
+        "accent": "#F8E79C",
+        "border": "#333333"
+      }
+    },
+    "tailwind_config": {
+      "colors": {
+        "gold": {
+          "100": "#F9F1D8",
+          "200": "#F0E1B9",
+          "300": "#E6C975",
+          "400": "#D4AF37",
+          "500": "#B4942B",
+          "600": "#8C7321"
+        },
+        "obsidian": "#050505",
+        "charcoal": "#0F0F0F"
+      },
+      "backgroundImage": {
+        "gold-gradient": "linear-gradient(135deg, #D4AF37 0%, #F8E79C 50%, #B4942B 100%)",
+        "dark-gradient": "linear-gradient(to bottom, #050505, #0F0F0F)"
+      }
+    }
+  },
+  "layout": {
+    "spacing_scale": "luxury",
+    "container_padding": "px-6 md:px-12 lg:px-24",
+    "section_spacing": "py-24 md:py-32",
+    "grid_system": "bento",
+    "border_radius": "rounded-none"
+  },
+  "visual_enhancers": {
+    "textures": {
+      "noise": "bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 mix-blend-overlay",
+      "gold_dust": "Custom canvas particle effect in hero"
+    },
+    "effects": {
+      "glass": "backdrop-blur-xl bg-black/40 border border-white/10",
+      "glow": "shadow-[0_0_30px_-10px_rgba(212,175,55,0.3)]",
+      "tracing_beam": "Animated gradient border for service cards"
+    }
+  },
+  "components": {
+    "Button": {
+      "variant_primary": "bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-8 py-4 hover:bg-gold-300 transition-colors duration-300 rounded-none",
+      "variant_outline": "bg-transparent border border-gold-400 text-gold-400 hover:bg-gold-400 hover:text-obsidian uppercase tracking-wider px-8 py-4 transition-all duration-300 rounded-none"
+    },
+    "Card": {
+      "style": "bg-charcoal border border-white/5 hover:border-gold-400/50 transition-colors duration-500 group relative overflow-hidden"
+    },
+    "Input": {
+      "style": "bg-transparent border-b border-white/20 focus:border-gold-400 outline-none text-white placeholder-white/30 rounded-none px-0 py-4 transition-all"
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_bg": "https://images.unsplash.com/photo-1692318578404-24e9c05b6984?q=85&w=2560&auto=format&fit=crop",
+      "about_bg": "https://images.unsplash.com/photo-1754033363474-6351dc642ad3?q=85&w=1200&auto=format&fit=crop",
+      "services": {
+        "nails": "https://images.unsplash.com/photo-1750598243589-1cc3770356b8?q=85&w=800&auto=format&fit=crop",
+        "lashes": "https://images.unsplash.com/photo-1672334115165-f82b6b5e8bee?q=85&w=800&auto=format&fit=crop",
+        "brows": "https://images.unsplash.com/photo-1755274556662-d37485f0677d?q=85&w=800&auto=format&fit=crop",
+        "makeup": "https://images.unsplash.com/photo-1755223738688-be7501b937d2?q=85&w=800&auto=format&fit=crop"
+      },
+      "gallery": [
+        "https://images.unsplash.com/photo-1594461287652-10b41090cf91?q=85&w=600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1516691475576-56cf13710ae9?q=85&w=600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1755274556345-949613163335?q=85&w=600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1750598243589-1cc3770356b8?q=85&w=600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1740484674184-77a7629506a5?q=85&w=600&auto=format&fit=crop"
+      ],
+      "interior": "https://images.pexels.com/photos/7750099/pexels-photo-7750099.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+    },
+    "icons": "lucide-react"
+  },
+  "motion": {
+    "library": "framer-motion",
+    "defaults": {
+      "duration": 0.6,
+      "ease": [0.22, 1, 0.36, 1],
+      "stagger": 0.1
+    },
+    "scroll": "Use 'framer-motion' useScroll for parallax effects on background images"
+  },
+  "content_structure": {
+    "nav_links": ["Services", "Gallery", "Prices", "Reviews", "Contact"],
+    "sections": [
+      "Hero (Full screen, gold glitter texture, editorial typography)",
+      "Services (Asymmetrical grid, hover reveals abstract gold textures)",
+      "Gallery (Bento grid, mix of close-ups and atmosphere)",
+      "Price List (Elegant minimal table with gold dividers)",
+      "Testimonials (Slow scroll marquee or fade carousel)",
+      "Promotions (High contrast banner with gold border)",
+      "Footer (Large typography, social links, location map)"
+    ]
+  },
+  "universal_guidelines": [
+    "Do not use gradients for dark backgrounds, use solid Obsidian #050505 with subtle noise.",
+    "Text MUST be readable. Use Gold #D4AF37 for accents only, not for long body text.",
+    "Buttons should have sharp edges (rounded-none) for a high-fashion look.",
+    "Images must be treated with a subtle dark overlay (bg-black/20) to ensure text contrast if text is over them.",
+    "Avoid standard 'card' layouts. Use lines and whitespace to separate content.",
+    "Use 'Playfair Display' for all Headings (h1-h3) and 'Manrope' for body text.",
+    "Implement a smooth scroll effect if possible."
+  ],
+  "instructions_to_main_agent": [
+    "Install 'lucide-react', 'framer-motion', 'clsx', 'tailwind-merge' first.",
+    "Update tailwind.config.js with the custom gold colors and font families immediately.",
+    "Create a reusable 'Section' component that handles the standard padding (py-24 px-6).",
+    "Use the provided Unsplash URLs. Do not use placeholders.",
+    "For the 'Social Media Feed', create a static grid of images (from the gallery assets) that links to the Instagram profile.",
+    "Ensure the 'Contact' section includes the specific phone numbers and address provided in the prompt."
+  ]
+}
