@@ -644,6 +644,7 @@ const Home = () => {
       <Promotions />
       <Contact />
       <Footer />
+      <WhatsAppFloat />
     </div>
   );
 };
