@@ -550,6 +550,272 @@ const Prices = ({ salonPrices, homePrices }) => {
     </section>
   );
 };
+
+// Home Booking Form
+const HomeBookingForm = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    service: '',
+    preferred_date: '',
+    preferred_time: '',
+    notes: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  const services = [
+    "Gel Extensions (Short)",
+    "Gel Extensions (Medium)", 
+    "Gel Extensions (Long)",
+    "Acrylic Full Set",
+    "Gel Polish Only",
+    "Classic Lashes",
+    "Volume Lashes",
+    "Mega Volume",
+    "Lash Lift & Tint",
+    "Brow Lamination",
+    "Brow Tint",
+    "Microblading",
+    "Microshading"
+  ];
+
+  const timeSlots = [
+    "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+    "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"
+  ];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      await axios.post(`${API}/bookings/home`, formData);
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to submit booking. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <section id="book-home" className="py-24 md:py-32 px-6 md:px-12 bg-charcoal" data-testid="home-booking-success">
+        <div className="max-w-2xl mx-auto text-center">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="w-20 h-20 bg-gold-400 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <CheckCircle size={40} className="text-obsidian" />
+          </motion.div>
+          <h2 className="font-serif text-3xl text-gold-100 mb-4">Booking Submitted!</h2>
+          <p className="text-neutral-400 mb-8">
+            We've received your home service request. We'll contact you shortly to confirm your appointment.
+          </p>
+          <button
+            onClick={() => { setSubmitted(false); setFormData({ name: '', phone: '', email: '', address: '', service: '', preferred_date: '', preferred_time: '', notes: '' }); }}
+            className="text-gold-400 hover:text-gold-300 underline"
+          >
+            Book Another Service
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section id="book-home" className="py-24 md:py-32 px-6 md:px-12 bg-charcoal" data-testid="home-booking-section">
+      <div className="max-w-3xl mx-auto">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={staggerContainer}
+          className="text-center mb-12"
+        >
+          <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.2em] text-gold-400 mb-4">
+            We Come To You
+          </motion.p>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-gold-100 mb-4">
+            Book Home Service
+          </motion.h2>
+          <motion.p variants={fadeInUp} className="text-neutral-400">
+            Fill out the form below and we'll bring the salon experience to your doorstep
+          </motion.p>
+        </motion.div>
+
+        <motion.form
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+          onSubmit={handleSubmit}
+          className="bg-obsidian border border-white/10 p-8"
+        >
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 mb-6 text-sm">
+              {error}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-gold-400 mb-2">
+                <User size={14} className="inline mr-2" />
+                Your Name *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                placeholder="Enter your name"
+                data-testid="booking-name-input"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-gold-400 mb-2">
+                <Phone size={14} className="inline mr-2" />
+                Phone Number *
+              </label>
+              <input
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                placeholder="e.g., 0805 857 8131"
+                data-testid="booking-phone-input"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-gold-400 mb-2">
+                <Mail size={14} className="inline mr-2" />
+                Email (Optional)
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                placeholder="your@email.com"
+                data-testid="booking-email-input"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-gold-400 mb-2">
+                <Sparkles size={14} className="inline mr-2" />
+                Service *
+              </label>
+              <select
+                required
+                value={formData.service}
+                onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                data-testid="booking-service-select"
+              >
+                <option value="">Select a service</option>
+                {services.map((service) => (
+                  <option key={service} value={service}>{service}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-gold-400 mb-2">
+                <Calendar size={14} className="inline mr-2" />
+                Preferred Date *
+              </label>
+              <input
+                type="date"
+                required
+                value={formData.preferred_date}
+                onChange={(e) => setFormData({ ...formData, preferred_date: e.target.value })}
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                data-testid="booking-date-input"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-gold-400 mb-2">
+                <Clock size={14} className="inline mr-2" />
+                Preferred Time *
+              </label>
+              <select
+                required
+                value={formData.preferred_time}
+                onChange={(e) => setFormData({ ...formData, preferred_time: e.target.value })}
+                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                data-testid="booking-time-select"
+              >
+                <option value="">Select time</option>
+                {timeSlots.map((time) => (
+                  <option key={time} value={time}>{time}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-xs uppercase tracking-wider text-gold-400 mb-2">
+                <MapPin size={14} className="inline mr-2" />
+                Your Address *
+              </label>
+              <textarea
+                required
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors min-h-[100px]"
+                placeholder="Enter your full address (street, area, landmark)"
+                data-testid="booking-address-input"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-xs uppercase tracking-wider text-gold-400 mb-2">
+                Additional Notes (Optional)
+              </label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                placeholder="Any special requests or details"
+                data-testid="booking-notes-input"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-8 bg-gold-400 text-obsidian font-bold uppercase tracking-wider py-4 hover:bg-gold-300 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            data-testid="booking-submit-btn"
+          >
+            {loading ? (
+              'Submitting...'
+            ) : (
+              <>
+                <Send size={18} />
+                Submit Booking Request
+              </>
+            )}
+          </button>
+
+          <p className="text-neutral-500 text-sm text-center mt-4">
+            We'll confirm your appointment via phone/WhatsApp within 24 hours
+          </p>
+        </motion.form>
+      </div>
     </section>
   );
 };
