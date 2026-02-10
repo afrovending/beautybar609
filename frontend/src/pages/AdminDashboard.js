@@ -193,6 +193,207 @@ const OverviewTab = () => {
   );
 };
 
+// Bookings Tab
+const BookingsTab = () => {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
+
+  const fetchBookings = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API}/bookings`);
+      setBookings(response.data);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  const updateStatus = async (bookingId, newStatus) => {
+    try {
+      await axios.put(`${API}/bookings/${bookingId}/status`, { status: newStatus });
+      fetchBookings();
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'confirmed': return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'completed': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'cancelled': return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default: return 'bg-neutral-500/20 text-neutral-400 border-neutral-500/30';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'pending': return <AlertCircle size={14} />;
+      case 'confirmed': return <CheckCircle size={14} />;
+      case 'completed': return <CheckCircle size={14} />;
+      case 'cancelled': return <XCircle size={14} />;
+      default: return <AlertCircle size={14} />;
+    }
+  };
+
+  const filteredBookings = filter === 'all' 
+    ? bookings 
+    : bookings.filter(b => b.status === filter);
+
+  const statusCounts = {
+    all: bookings.length,
+    pending: bookings.filter(b => b.status === 'pending').length,
+    confirmed: bookings.filter(b => b.status === 'confirmed').length,
+    completed: bookings.filter(b => b.status === 'completed').length,
+    cancelled: bookings.filter(b => b.status === 'cancelled').length,
+  };
+
+  if (loading) return <div className="text-neutral-400">Loading bookings...</div>;
+
+  return (
+    <div data-testid="bookings-tab">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-serif text-2xl text-gold-100">Home Service Bookings</h2>
+        <span className="text-gold-400 text-sm">{bookings.length} total bookings</span>
+      </div>
+
+      {/* Filter tabs */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
+          <button
+            key={status}
+            onClick={() => setFilter(status)}
+            className={`px-4 py-2 text-sm uppercase tracking-wider transition-colors ${
+              filter === status
+                ? 'bg-gold-400 text-obsidian font-bold'
+                : 'bg-charcoal border border-white/10 text-neutral-400 hover:text-white'
+            }`}
+            data-testid={`filter-${status}`}
+          >
+            {status} ({statusCounts[status]})
+          </button>
+        ))}
+      </div>
+
+      {filteredBookings.length === 0 ? (
+        <div className="text-center py-12 text-neutral-500">
+          <Calendar size={48} className="mx-auto mb-4 opacity-50" />
+          <p>No {filter === 'all' ? '' : filter} bookings yet</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredBookings.map((booking) => (
+            <motion.div
+              key={booking.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-charcoal border border-white/10 p-6"
+              data-testid={`booking-${booking.id}`}
+            >
+              <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-white font-medium text-lg">{booking.name}</h3>
+                    <span className={`flex items-center gap-1 px-2 py-1 text-xs uppercase border ${getStatusColor(booking.status)}`}>
+                      {getStatusIcon(booking.status)}
+                      {booking.status}
+                    </span>
+                    {booking.sms_sent && (
+                      <span className="flex items-center gap-1 px-2 py-1 text-xs bg-green-500/10 text-green-400 border border-green-500/20">
+                        <MessageCircle size={12} />
+                        SMS Sent
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                    <div className="flex items-center gap-2 text-neutral-400">
+                      <Phone size={14} className="text-gold-400" />
+                      <a href={`tel:${booking.phone}`} className="hover:text-gold-400">{booking.phone}</a>
+                    </div>
+                    <div className="flex items-center gap-2 text-neutral-400">
+                      <Calendar size={14} className="text-gold-400" />
+                      {booking.preferred_date}
+                    </div>
+                    <div className="flex items-center gap-2 text-neutral-400">
+                      <Clock size={14} className="text-gold-400" />
+                      {booking.preferred_time}
+                    </div>
+                  </div>
+
+                  <div className="mt-3 p-3 bg-obsidian">
+                    <p className="text-gold-400 text-sm font-medium mb-1">{booking.service}</p>
+                    <div className="flex items-start gap-2 text-neutral-400 text-sm">
+                      <MapPin size={14} className="text-gold-400 mt-0.5 flex-shrink-0" />
+                      <span>{booking.address}</span>
+                    </div>
+                    {booking.notes && (
+                      <p className="text-neutral-500 text-sm mt-2 italic">Note: {booking.notes}</p>
+                    )}
+                  </div>
+
+                  <p className="text-neutral-600 text-xs mt-3">
+                    Booked: {new Date(booking.created_at).toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap lg:flex-col gap-2">
+                  {booking.status === 'pending' && (
+                    <>
+                      <button
+                        onClick={() => updateStatus(booking.id, 'confirmed')}
+                        className="flex items-center gap-2 bg-green-500/20 text-green-400 border border-green-500/30 px-4 py-2 text-sm hover:bg-green-500/30 transition-colors"
+                        data-testid={`confirm-${booking.id}`}
+                      >
+                        <CheckCircle size={14} />
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => updateStatus(booking.id, 'cancelled')}
+                        className="flex items-center gap-2 bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 text-sm hover:bg-red-500/30 transition-colors"
+                        data-testid={`cancel-${booking.id}`}
+                      >
+                        <XCircle size={14} />
+                        Cancel
+                      </button>
+                    </>
+                  )}
+                  {booking.status === 'confirmed' && (
+                    <button
+                      onClick={() => updateStatus(booking.id, 'completed')}
+                      className="flex items-center gap-2 bg-blue-500/20 text-blue-400 border border-blue-500/30 px-4 py-2 text-sm hover:bg-blue-500/30 transition-colors"
+                      data-testid={`complete-${booking.id}`}
+                    >
+                      <CheckCircle size={14} />
+                      Mark Complete
+                    </button>
+                  )}
+                  <a
+                    href={`https://wa.me/234${booking.phone.replace(/^0/, '').replace(/\s/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 bg-gold-400/20 text-gold-400 border border-gold-400/30 px-4 py-2 text-sm hover:bg-gold-400/30 transition-colors"
+                  >
+                    <MessageCircle size={14} />
+                    WhatsApp
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Services Tab
 const ServicesTab = () => {
   const [services, setServices] = useState([]);
