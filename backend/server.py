@@ -440,11 +440,20 @@ async def create_home_booking(booking: HomeBookingRequest):
         **booking.model_dump(),
         "status": "pending",
         "booking_type": "home",
+        "sms_sent": False,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.bookings.insert_one(booking_doc)
     
-    # Send notification email if SendGrid configured
+    # Send SMS confirmation to customer
+    sms_message = f"Hi {booking.name}! Your BeautyBar609 home service booking is received. Service: {booking.service}, Date: {booking.preferred_date} at {booking.preferred_time}. We'll confirm shortly. Call 08058578131 for queries."
+    sms_sent = send_sms_notification(booking.phone, sms_message)
+    
+    # Update booking with SMS status
+    if sms_sent:
+        await db.bookings.update_one({"id": booking_doc["id"]}, {"$set": {"sms_sent": True}})
+    
+    # Send notification email to admin if SendGrid configured
     if SENDGRID_API_KEY:
         try:
             html_content = f"""
@@ -460,6 +469,7 @@ async def create_home_booking(booking: HomeBookingRequest):
                     <p><strong>Time:</strong> {booking.preferred_time}</p>
                     <p><strong>Address:</strong> {booking.address}</p>
                     <p><strong>Notes:</strong> {booking.notes or 'None'}</p>
+                    <p><strong>SMS Sent:</strong> {'Yes' if sms_sent else 'No'}</p>
                 </div>
             </body>
             </html>
@@ -475,23 +485,37 @@ async def create_home_booking(booking: HomeBookingRequest):
         except Exception as e:
             logger.error(f"Failed to send booking notification: {e}")
     
-    return {"message": "Booking request submitted successfully", "booking_id": booking_doc["id"]}
+    return {"message": "Booking request submitted successfully", "booking_id": booking_doc["id"], "sms_sent": sms_sent}
 
 @api_router.get("/bookings")
 async def get_bookings(user: dict = Depends(get_current_user)):
     bookings = await db.bookings.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
     return bookings
 
+class StatusUpdate(BaseModel):
+    status: str
+
 @api_router.put("/bookings/{booking_id}/status")
-async def update_booking_status(booking_id: str, status: str, user: dict = Depends(get_current_user)):
-    if status not in ["pending", "confirmed", "completed", "cancelled"]:
+async def update_booking_status(booking_id: str, data: StatusUpdate, user: dict = Depends(get_current_user)):
+    if data.status not in ["pending", "confirmed", "completed", "cancelled"]:
         raise HTTPException(status_code=400, detail="Invalid status")
     
-    result = await db.bookings.update_one({"id": booking_id}, {"$set": {"status": status}})
-    if result.matched_count == 0:
+    # Get booking details for SMS
+    booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
+    if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     
-    return {"message": f"Booking status updated to {status}"}
+    result = await db.bookings.update_one({"id": booking_id}, {"$set": {"status": data.status}})
+    
+    # Send SMS notification for status changes
+    if data.status == "confirmed":
+        sms_message = f"Hi {booking['name']}! Great news! Your BeautyBar609 home service for {booking['service']} on {booking['preferred_date']} at {booking['preferred_time']} is CONFIRMED. See you soon!"
+        send_sms_notification(booking['phone'], sms_message)
+    elif data.status == "cancelled":
+        sms_message = f"Hi {booking['name']}, your BeautyBar609 booking for {booking['preferred_date']} has been cancelled. Please call 08058578131 to reschedule."
+        send_sms_notification(booking['phone'], sms_message)
+    
+    return {"message": f"Booking status updated to {data.status}"}
 
 # ================== TESTIMONIALS ROUTES ==================
 
