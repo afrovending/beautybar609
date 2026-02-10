@@ -51,6 +51,8 @@ With admin panel for content management, analytics tracking, and image uploads.
 - ✅ Gallery management (CRUD + image upload)
 - ✅ Basic analytics (page views, unique visitors, popular sections)
 - ✅ Mobile responsive admin UI
+- ✅ Password reset with SendGrid email integration
+- ✅ Rate limiting on forgot-password (3/min)
 
 ## Contact Information
 - WhatsApp: 0805 857 8131
