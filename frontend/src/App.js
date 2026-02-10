@@ -920,7 +920,7 @@ const Contact = () => {
   const contactInfo = [
     { icon: MessageCircle, label: "WhatsApp", value: "0805 857 8131", href: "https://wa.me/2348058578131" },
     { icon: Phone, label: "Phone", value: "0905 995 2338", href: "tel:+2349059952338" },
-    { icon: Mail, label: "Email", value: "moromokeid@gmail.com", href: "mailto:moromokeid@gmail.com" },
+    { icon: Mail, label: "Email", value: "moromokeid69@gmail.com", href: "mailto:moromokeid69@gmail.com" },
     { icon: MapPin, label: "Address", value: "57, Arowolo Street, Off Agbe Road, Abule Egba", href: "https://maps.google.com/?q=Arowolo+Street+Abule+Egba+Lagos" },
   ];
 
