@@ -1,6 +1,6 @@
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { AuthProvider } from "./context/AuthContext";
 import AdminLogin from "./pages/AdminLogin";
@@ -16,7 +16,14 @@ import {
   ChevronRight,
   Menu,
   X,
-  Sparkles
+  Sparkles,
+  Home,
+  Building2,
+  Calendar,
+  Clock,
+  User,
+  Send,
+  CheckCircle
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
