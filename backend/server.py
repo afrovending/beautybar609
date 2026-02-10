@@ -236,11 +236,15 @@ async def get_me(user: dict = Depends(get_current_user)):
     return {"id": user["id"], "email": user["email"], "name": user["name"]}
 
 @api_router.post("/auth/forgot-password")
-async def forgot_password(request: PasswordResetRequest):
-    user = await db.users.find_one({"email": request.email})
+@limiter.limit("3/minute")  # Rate limit: 3 requests per minute per IP
+async def forgot_password(request: Request, data: PasswordResetRequest):
+    user = await db.users.find_one({"email": data.email})
+    
+    # Always return same message to prevent email enumeration
+    response_message = "If email exists, reset instructions have been sent"
+    
     if not user:
-        # Don't reveal if email exists
-        return {"message": "If email exists, reset instructions sent"}
+        return {"message": response_message, "email_sent": False}
     
     # Generate reset token (valid for 1 hour)
     reset_token = str(uuid.uuid4())
@@ -253,9 +257,17 @@ async def forgot_password(request: PasswordResetRequest):
         "used": False
     })
     
-    # In production, send email here. For now, return token for testing
-    logger.info(f"Password reset token for {request.email}: {reset_token}")
-    return {"message": "If email exists, reset instructions sent", "reset_token": reset_token}
+    # Send email via SendGrid
+    user_name = user.get("name", "User")
+    email_sent = send_password_reset_email(data.email, reset_token, user_name)
+    
+    if email_sent:
+        logger.info(f"Password reset email sent to {data.email}")
+        return {"message": response_message, "email_sent": True}
+    else:
+        # If SendGrid not configured, return token for testing (remove in production)
+        logger.warning(f"SendGrid not configured. Reset token for {data.email}: {reset_token}")
+        return {"message": response_message, "email_sent": False, "reset_token": reset_token}
 
 @api_router.post("/auth/reset-password")
 async def reset_password(request: PasswordReset):
