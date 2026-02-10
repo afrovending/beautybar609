@@ -1066,7 +1066,8 @@ const Footer = () => {
 // Main Home Page with data fetching
 const Home = () => {
   const [services, setServices] = useState(fallbackServices);
-  const [priceList, setPriceList] = useState(fallbackPriceList);
+  const [salonPrices, setSalonPrices] = useState(fallbackPriceList);
+  const [homePrices, setHomePrices] = useState([]);
   const [testimonials, setTestimonials] = useState(fallbackTestimonials);
   const [gallery, setGallery] = useState(fallbackGallery);
   const [promotion, setPromotion] = useState({ title: "Special Offer", description: "Book a full set of nails and lashes together and get your total service discount. Valid for first-time clients!", discount: "15% OFF" });
@@ -1074,16 +1075,18 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [servicesRes, pricesRes, testimonialsRes, galleryRes, promotionRes] = await Promise.all([
+        const [servicesRes, salonPricesRes, homePricesRes, testimonialsRes, galleryRes, promotionRes] = await Promise.all([
           axios.get(`${API}/services`).catch(() => ({ data: [] })),
-          axios.get(`${API}/prices`).catch(() => ({ data: [] })),
+          axios.get(`${API}/prices?service_type=salon`).catch(() => ({ data: [] })),
+          axios.get(`${API}/prices?service_type=home`).catch(() => ({ data: [] })),
           axios.get(`${API}/testimonials`).catch(() => ({ data: [] })),
           axios.get(`${API}/gallery`).catch(() => ({ data: [] })),
           axios.get(`${API}/promotions/active`).catch(() => ({ data: null }))
         ]);
 
         if (servicesRes.data?.length) setServices(servicesRes.data);
-        if (pricesRes.data?.length) setPriceList(pricesRes.data);
+        if (salonPricesRes.data?.length) setSalonPrices(salonPricesRes.data);
+        if (homePricesRes.data?.length) setHomePrices(homePricesRes.data);
         if (testimonialsRes.data?.length) setTestimonials(testimonialsRes.data);
         if (galleryRes.data?.length) setGallery(galleryRes.data);
         if (promotionRes.data) setPromotion(promotionRes.data);
