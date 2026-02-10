@@ -96,6 +96,17 @@ class PriceCategoryCreate(BaseModel):
     category: str
     items: List[dict]
     order: int = 0
+    service_type: str = "salon"  # "salon" or "home"
+
+class HomeBookingRequest(BaseModel):
+    name: str
+    phone: str
+    email: Optional[EmailStr] = None
+    address: str
+    service: str
+    preferred_date: str
+    preferred_time: str
+    notes: Optional[str] = ""
 
 class TestimonialCreate(BaseModel):
     name: str
