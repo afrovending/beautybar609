@@ -392,6 +392,106 @@ class BeautyBar609AdminTester:
             return self.log_test("Seed data", True, response)
         return self.log_test("Seed data", False, response, "Failed to seed data")
 
+    def test_home_service_prices(self):
+        """Test home service pricing endpoints (NEW FEATURE)"""
+        print("\n🏠 Testing Home Service Features...")
+        
+        # Test GET prices for salon
+        response = self.make_request('GET', '/prices?service_type=salon')
+        if response and response.status_code == 200:
+            salon_prices = response.json()
+            if salon_prices and isinstance(salon_prices, list):
+                # Check if we have expected salon prices
+                found_nails = any('NAILS' in str(category.get('category', '')).upper() for category in salon_prices)
+                if found_nails:
+                    self.log_test("Salon prices API", True, response)
+                else:
+                    self.log_test("Salon prices API", False, response, "No nail services found")
+            else:
+                self.log_test("Salon prices API", False, response, "Empty or invalid response")
+        else:
+            self.log_test("Salon prices API", False, response, "Failed to fetch salon prices")
+
+        # Test GET prices for home service
+        response = self.make_request('GET', '/prices?service_type=home')  
+        if response and response.status_code == 200:
+            home_prices = response.json()
+            if home_prices and isinstance(home_prices, list):
+                # Check if we have home service prices (should be higher than salon)
+                found_home_nails = any('NAILS' in str(category.get('category', '')).upper() for category in home_prices)
+                if found_home_nails:
+                    # Verify home prices are higher than salon prices by checking for transport fees
+                    home_item = None
+                    for category in home_prices:
+                        if 'NAILS' in str(category.get('category', '')).upper():
+                            for item in category.get('items', []):
+                                if 'Short' in item.get('name', ''):
+                                    home_item = item
+                                    break
+                    
+                    if home_item:
+                        # Extract price from format like "₦22,000"
+                        home_price_str = home_item.get('price', '').replace('₦', '').replace(',', '')
+                        try:
+                            home_price = int(home_price_str)
+                            if home_price > 20000:  # Should be higher than salon price
+                                self.log_test("Home service prices API (higher pricing)", True, response)
+                            else:
+                                self.log_test("Home service prices API (higher pricing)", False, response, f"Home price {home_price} not higher than salon")
+                        except ValueError:
+                            self.log_test("Home service prices API (higher pricing)", False, response, "Could not parse home service price")
+                    else:
+                        self.log_test("Home service prices API (higher pricing)", False, response, "No gel extension short item found")
+                else:
+                    self.log_test("Home service prices API", False, response, "No home service nail prices found")
+            else:
+                self.log_test("Home service prices API", False, response, "Empty or invalid home prices response")
+        else:
+            self.log_test("Home service prices API", False, response, "Failed to fetch home prices")
+
+    def test_home_booking_api(self):
+        """Test home booking endpoint (NEW FEATURE)"""
+        # Test POST /api/bookings/home
+        booking_data = {
+            "name": "Test Customer",
+            "phone": "0805857831",
+            "email": "test@example.com",
+            "address": "123 Test Street, Lagos",
+            "service": "Gel Extensions (Short)",
+            "preferred_date": "2024-12-31",
+            "preferred_time": "2:00 PM",
+            "notes": "This is a test booking for automated testing"
+        }
+        
+        response = self.make_request('POST', '/bookings/home', booking_data)
+        if response and response.status_code == 200:
+            response_data = response.json()
+            if 'booking_id' in response_data and 'message' in response_data:
+                booking_id = response_data['booking_id']
+                # Store for potential cleanup
+                if 'bookings' not in self.created_ids:
+                    self.created_ids['bookings'] = []
+                self.created_ids['bookings'].append(booking_id)
+                self.log_test("Home booking creation", True, response)
+                
+                # Test getting all bookings to verify our booking was created
+                if self.token:  # Admin endpoint, requires auth
+                    response = self.make_request('GET', '/bookings')
+                    if response and response.status_code == 200:
+                        bookings = response.json()
+                        # Check if our booking exists
+                        booking_found = any(b.get('id') == booking_id for b in bookings)
+                        if booking_found:
+                            self.log_test("Home booking retrieval", True, response)
+                        else:
+                            self.log_test("Home booking retrieval", False, response, "Created booking not found in list")
+                    else:
+                        self.log_test("Home booking retrieval", False, response, "Failed to retrieve bookings")
+            else:
+                self.log_test("Home booking creation", False, response, "Missing booking_id or message in response")
+        else:
+            self.log_test("Home booking creation", False, response, "Failed to create home booking")
+
     def cleanup_test_data(self):
         """Clean up any test data created during testing"""
         if not self.token:
