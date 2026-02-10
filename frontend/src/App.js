@@ -1105,7 +1105,8 @@ const Home = () => {
       <Hero />
       <Services services={services} />
       <Gallery images={gallery} />
-      <Prices priceList={priceList} />
+      <Prices salonPrices={salonPrices} homePrices={homePrices.length ? homePrices : salonPrices} />
+      <HomeBookingForm />
       <Testimonials testimonials={testimonials} />
       <Promotions promotion={promotion} />
       <Contact />
