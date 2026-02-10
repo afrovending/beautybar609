@@ -1,7 +1,11 @@
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { AuthProvider } from "./context/AuthContext";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import axios from "axios";
 import { 
   Phone, 
   Mail, 
@@ -15,39 +19,40 @@ import {
   Sparkles
 } from "lucide-react";
 
-// Data
-const services = [
-  {
-    id: 1,
-    title: "Nails Extensions",
-    description: "Custom nail art and extensions that make a statement",
-    image: "https://images.unsplash.com/photo-1750598243589-1cc3770356b8?q=85&w=800&auto=format&fit=crop",
-    price: "From ₦15,000"
-  },
-  {
-    id: 2,
-    title: "Lashes Extensions",
-    description: "Volume and classic lashes for that perfect flutter",
-    image: "https://images.unsplash.com/photo-1672334115165-f82b6b5e8bee?q=85&w=800&auto=format&fit=crop",
-    price: "From ₦20,000"
-  },
-  {
-    id: 3,
-    title: "Brow Tinting & Lamination",
-    description: "Perfectly sculpted brows that frame your face",
-    image: "https://images.unsplash.com/photo-1755274556662-d37485f0677d?q=85&w=800&auto=format&fit=crop",
-    price: "From ₦12,000"
-  },
-  {
-    id: 4,
-    title: "Microblading",
-    description: "Semi-permanent brows with natural hair-stroke technique",
-    image: "https://images.unsplash.com/photo-1755223738688-be7501b937d2?q=85&w=800&auto=format&fit=crop",
-    price: "From ₦80,000"
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// Generate visitor ID for analytics
+const getVisitorId = () => {
+  let visitorId = localStorage.getItem('visitorId');
+  if (!visitorId) {
+    visitorId = 'v_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('visitorId', visitorId);
   }
+  return visitorId;
+};
+
+// Track page view
+const trackView = async (section = null) => {
+  try {
+    await axios.post(`${API}/analytics/track`, {
+      page: window.location.pathname,
+      section,
+      visitor_id: getVisitorId()
+    });
+  } catch (error) {
+    // Silent fail for analytics
+  }
+};
+
+// Fallback data
+const fallbackServices = [
+  { id: 1, title: "Nails Extensions", description: "Custom nail art and extensions that make a statement", image: "https://images.unsplash.com/photo-1750598243589-1cc3770356b8?q=85&w=800&auto=format&fit=crop", price: "From ₦15,000" },
+  { id: 2, title: "Lashes Extensions", description: "Volume and classic lashes for that perfect flutter", image: "https://images.unsplash.com/photo-1672334115165-f82b6b5e8bee?q=85&w=800&auto=format&fit=crop", price: "From ₦20,000" },
+  { id: 3, title: "Brow Tinting & Lamination", description: "Perfectly sculpted brows that frame your face", image: "https://images.unsplash.com/photo-1755274556662-d37485f0677d?q=85&w=800&auto=format&fit=crop", price: "From ₦12,000" },
+  { id: 4, title: "Microblading", description: "Semi-permanent brows with natural hair-stroke technique", image: "https://images.unsplash.com/photo-1755223738688-be7501b937d2?q=85&w=800&auto=format&fit=crop", price: "From ₦80,000" }
 ];
 
-const priceList = [
+const fallbackPriceList = [
   { category: "NAILS", items: [
     { name: "Gel Extensions (Short)", price: "₦15,000" },
     { name: "Gel Extensions (Medium)", price: "₦18,000" },
@@ -72,7 +77,7 @@ const priceList = [
   ]}
 ];
 
-const testimonials = [
+const fallbackTestimonials = [
   { id: 1, name: "Amaka O.", text: "Absolutely love my nails! The attention to detail is amazing. Will definitely be back!", rating: 5 },
   { id: 2, name: "Blessing A.", text: "Best lash extensions in Lagos! They last so long and look so natural.", rating: 5 },
   { id: 3, name: "Chidinma E.", text: "My brows have never looked better. The microblading is life-changing!", rating: 5 },
@@ -80,7 +85,7 @@ const testimonials = [
   { id: 5, name: "Favour N.", text: "The salon is so clean and the staff are so friendly. Highly recommend!", rating: 5 },
 ];
 
-const galleryImages = [
+const fallbackGallery = [
   "https://images.unsplash.com/photo-1594461287652-10b41090cf91?q=85&w=600&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1516691475576-56cf13710ae9?q=85&w=600&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1755274556345-949613163335?q=85&w=600&auto=format&fit=crop",
@@ -113,7 +118,6 @@ const Navigation = () => {
             BeautyBar<span className="text-gold-200">609</span>
           </a>
           
-          {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <a
@@ -127,7 +131,6 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden text-gold-400"
             onClick={() => setIsOpen(!isOpen)}
@@ -138,7 +141,6 @@ const Navigation = () => {
         </div>
       </div>
 
-      {/* Mobile Nav */}
       {isOpen && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -173,9 +175,12 @@ const Hero = () => {
   });
   const y = useTransform(scrollYProgress, [0, 1], [0, 150]);
 
+  useEffect(() => {
+    trackView('hero');
+  }, []);
+
   return (
     <section id="hero" ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden" data-testid="hero-section">
-      {/* Background */}
       <motion.div style={{ y }} className="absolute inset-0">
         <img
           src="https://images.unsplash.com/photo-1692318578404-24e9c05b6984?q=85&w=2560&auto=format&fit=crop"
@@ -185,7 +190,6 @@ const Hero = () => {
         <div className="hero-overlay absolute inset-0" />
       </motion.div>
 
-      {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
         <motion.div
           initial="hidden"
@@ -223,7 +227,6 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
       <motion.div
         animate={{ y: [0, 10, 0] }}
         transition={{ repeat: Infinity, duration: 2 }}
@@ -236,7 +239,21 @@ const Hero = () => {
 };
 
 // Services Section
-const Services = () => {
+const Services = ({ services }) => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          trackView('services');
+        }
+      },
+      { threshold: 0.3 }
+    );
+    const el = document.getElementById('services');
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section id="services" className="py-24 md:py-32 px-6 md:px-12 bg-obsidian" data-testid="services-section">
       <div className="max-w-7xl mx-auto">
@@ -262,12 +279,12 @@ const Services = () => {
           variants={staggerContainer}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {services.map((service) => (
+          {services.map((service, index) => (
             <motion.div
-              key={service.id}
+              key={service.id || index}
               variants={fadeInUp}
               className="service-card group relative h-[400px] bg-charcoal border border-white/5 hover:border-gold-400/50 transition-colors duration-500"
-              data-testid={`service-card-${service.id}`}
+              data-testid={`service-card-${index}`}
             >
               <img
                 src={service.image}
@@ -290,7 +307,21 @@ const Services = () => {
 };
 
 // Gallery Section
-const Gallery = () => {
+const Gallery = ({ images }) => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          trackView('gallery');
+        }
+      },
+      { threshold: 0.3 }
+    );
+    const el = document.getElementById('gallery');
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section id="gallery" className="py-24 md:py-32 px-6 md:px-12 bg-charcoal" data-testid="gallery-section">
       <div className="max-w-7xl mx-auto">
@@ -316,20 +347,23 @@ const Gallery = () => {
           variants={staggerContainer}
           className="grid grid-cols-2 md:grid-cols-3 gap-4"
         >
-          {galleryImages.map((img, index) => (
-            <motion.div
-              key={index}
-              variants={fadeInUp}
-              className={`gallery-item ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
-              data-testid={`gallery-item-${index}`}
-            >
-              <img
-                src={img}
-                alt={`Gallery ${index + 1}`}
-                className={`w-full object-cover ${index === 0 ? 'h-full' : 'h-48 md:h-64'}`}
-              />
-            </motion.div>
-          ))}
+          {images.map((img, index) => {
+            const imgUrl = typeof img === 'string' ? img : img.url;
+            return (
+              <motion.div
+                key={index}
+                variants={fadeInUp}
+                className={`gallery-item ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
+                data-testid={`gallery-item-${index}`}
+              >
+                <img
+                  src={imgUrl}
+                  alt={`Gallery ${index + 1}`}
+                  className={`w-full object-cover ${index === 0 ? 'h-full' : 'h-48 md:h-64'}`}
+                />
+              </motion.div>
+            );
+          })}
         </motion.div>
 
         <motion.div
@@ -356,7 +390,21 @@ const Gallery = () => {
 };
 
 // Prices Section
-const Prices = () => {
+const Prices = ({ priceList }) => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          trackView('prices');
+        }
+      },
+      { threshold: 0.3 }
+    );
+    const el = document.getElementById('prices');
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section id="prices" className="py-24 md:py-32 px-6 md:px-12 bg-obsidian" data-testid="prices-section">
       <div className="max-w-5xl mx-auto">
@@ -418,7 +466,21 @@ const Prices = () => {
 };
 
 // Testimonials Section
-const Testimonials = () => {
+const Testimonials = ({ testimonials }) => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          trackView('reviews');
+        }
+      },
+      { threshold: 0.3 }
+    );
+    const el = document.getElementById('reviews');
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section id="reviews" className="py-24 md:py-32 bg-charcoal overflow-hidden" data-testid="testimonials-section">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
@@ -438,7 +500,6 @@ const Testimonials = () => {
         </motion.div>
       </div>
 
-      {/* Marquee */}
       <div className="relative">
         <div className="testimonial-track">
           {[...testimonials, ...testimonials].map((testimonial, index) => (
@@ -463,7 +524,9 @@ const Testimonials = () => {
 };
 
 // Promotions Section
-const Promotions = () => {
+const Promotions = ({ promotion }) => {
+  if (!promotion) return null;
+
   return (
     <section className="py-16 px-6 md:px-12 bg-obsidian" data-testid="promotions-section">
       <div className="max-w-5xl mx-auto">
@@ -477,13 +540,13 @@ const Promotions = () => {
           <div className="promo-shimmer absolute inset-0 pointer-events-none" />
           <Sparkles className="text-gold-400 mx-auto mb-4" size={32} />
           <h3 className="font-serif text-2xl md:text-4xl text-gold-100 mb-4">
-            Special Offer
+            {promotion.title}
           </h3>
           <p className="text-neutral-300 mb-6 max-w-xl mx-auto">
-            Book a full set of nails and lashes together and get <span className="text-gold-400 font-bold">15% OFF</span> your total service. Valid for first-time clients!
+            {promotion.description} <span className="text-gold-400 font-bold">{promotion.discount}</span>
           </p>
           <a
-            href="https://wa.me/2348058578131?text=Hi!%20I'm%20interested%20in%20the%20special%20offer%20for%20nails%20and%20lashes."
+            href="https://wa.me/2348058578131?text=Hi!%20I'm%20interested%20in%20the%20special%20offer."
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-8 py-4 hover:bg-gold-300 transition-colors duration-300"
@@ -505,6 +568,20 @@ const Contact = () => {
     { icon: Mail, label: "Email", value: "moromokeid@gmail.com", href: "mailto:moromokeid@gmail.com" },
     { icon: MapPin, label: "Address", value: "57, Arowolo Street, Off Agbe Road, Abule Egba", href: "https://maps.google.com/?q=Arowolo+Street+Abule+Egba+Lagos" },
   ];
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          trackView('contact');
+        }
+      },
+      { threshold: 0.3 }
+    );
+    const el = document.getElementById('contact');
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section id="contact" className="py-24 md:py-32 px-6 md:px-12 bg-charcoal" data-testid="contact-section">
@@ -631,17 +708,48 @@ const Footer = () => {
   );
 };
 
-// Main Home Page
+// Main Home Page with data fetching
 const Home = () => {
+  const [services, setServices] = useState(fallbackServices);
+  const [priceList, setPriceList] = useState(fallbackPriceList);
+  const [testimonials, setTestimonials] = useState(fallbackTestimonials);
+  const [gallery, setGallery] = useState(fallbackGallery);
+  const [promotion, setPromotion] = useState({ title: "Special Offer", description: "Book a full set of nails and lashes together and get your total service discount. Valid for first-time clients!", discount: "15% OFF" });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [servicesRes, pricesRes, testimonialsRes, galleryRes, promotionRes] = await Promise.all([
+          axios.get(`${API}/services`).catch(() => ({ data: [] })),
+          axios.get(`${API}/prices`).catch(() => ({ data: [] })),
+          axios.get(`${API}/testimonials`).catch(() => ({ data: [] })),
+          axios.get(`${API}/gallery`).catch(() => ({ data: [] })),
+          axios.get(`${API}/promotions/active`).catch(() => ({ data: null }))
+        ]);
+
+        if (servicesRes.data?.length) setServices(servicesRes.data);
+        if (pricesRes.data?.length) setPriceList(pricesRes.data);
+        if (testimonialsRes.data?.length) setTestimonials(testimonialsRes.data);
+        if (galleryRes.data?.length) setGallery(galleryRes.data);
+        if (promotionRes.data) setPromotion(promotionRes.data);
+      } catch (error) {
+        console.log('Using fallback data');
+      }
+    };
+
+    fetchData();
+    trackView('page_load');
+  }, []);
+
   return (
     <div className="bg-obsidian min-h-screen" data-testid="home-page">
       <Navigation />
       <Hero />
-      <Services />
-      <Gallery />
-      <Prices />
-      <Testimonials />
-      <Promotions />
+      <Services services={services} />
+      <Gallery images={gallery} />
+      <Prices priceList={priceList} />
+      <Testimonials testimonials={testimonials} />
+      <Promotions promotion={promotion} />
       <Contact />
       <Footer />
       <WhatsAppFloat />
@@ -651,11 +759,15 @@ const Home = () => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
