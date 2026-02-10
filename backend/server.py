@@ -16,6 +16,7 @@ from datetime import datetime, timezone, timedelta
 import jwt
 import bcrypt
 import base64
+import requests
 
 # SendGrid
 from sendgrid import SendGridAPIClient
@@ -38,6 +39,10 @@ JWT_EXPIRATION_HOURS = 24
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'noreply@beautybar609.com')
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://beautybar-preview.preview.emergentagent.com')
+
+# Termii Settings
+TERMII_API_KEY = os.environ.get('TERMII_API_KEY')
+TERMII_SENDER_ID = os.environ.get('TERMII_SENDER_ID', 'BeautyBar')
 
 # Rate Limiter
 limiter = Limiter(key_func=get_remote_address)
