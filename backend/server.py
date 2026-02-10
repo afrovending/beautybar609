@@ -350,8 +350,11 @@ async def delete_service(service_id: str, user: dict = Depends(get_current_user)
 # ================== PRICE LIST ROUTES ==================
 
 @api_router.get("/prices")
-async def get_prices():
-    prices = await db.prices.find({}, {"_id": 0}).sort("order", 1).to_list(100)
+async def get_prices(service_type: Optional[str] = None):
+    query = {}
+    if service_type:
+        query["service_type"] = service_type
+    prices = await db.prices.find(query, {"_id": 0}).sort("order", 1).to_list(100)
     return prices
 
 @api_router.post("/prices")
@@ -380,6 +383,68 @@ async def delete_price_category(price_id: str, user: dict = Depends(get_current_
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Price category not found")
     return {"message": "Price category deleted"}
+
+# ================== HOME BOOKING ROUTES ==================
+
+@api_router.post("/bookings/home")
+async def create_home_booking(booking: HomeBookingRequest):
+    booking_doc = {
+        "id": str(uuid.uuid4()),
+        **booking.model_dump(),
+        "status": "pending",
+        "booking_type": "home",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.bookings.insert_one(booking_doc)
+    
+    # Send notification email if SendGrid configured
+    if SENDGRID_API_KEY:
+        try:
+            html_content = f"""
+            <html>
+            <body style="font-family: Arial, sans-serif; background-color: #050505; color: #F9F1D8; padding: 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: #0F0F0F; padding: 30px; border: 1px solid #333;">
+                    <h1 style="color: #D4AF37;">New Home Service Booking!</h1>
+                    <p><strong>Client:</strong> {booking.name}</p>
+                    <p><strong>Phone:</strong> {booking.phone}</p>
+                    <p><strong>Email:</strong> {booking.email or 'Not provided'}</p>
+                    <p><strong>Service:</strong> {booking.service}</p>
+                    <p><strong>Date:</strong> {booking.preferred_date}</p>
+                    <p><strong>Time:</strong> {booking.preferred_time}</p>
+                    <p><strong>Address:</strong> {booking.address}</p>
+                    <p><strong>Notes:</strong> {booking.notes or 'None'}</p>
+                </div>
+            </body>
+            </html>
+            """
+            message = Mail(
+                from_email=SENDER_EMAIL,
+                to_emails=SENDER_EMAIL,
+                subject=f"New Home Service Booking - {booking.name}",
+                html_content=html_content
+            )
+            sg = SendGridAPIClient(SENDGRID_API_KEY)
+            sg.send(message)
+        except Exception as e:
+            logger.error(f"Failed to send booking notification: {e}")
+    
+    return {"message": "Booking request submitted successfully", "booking_id": booking_doc["id"]}
+
+@api_router.get("/bookings")
+async def get_bookings(user: dict = Depends(get_current_user)):
+    bookings = await db.bookings.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return bookings
+
+@api_router.put("/bookings/{booking_id}/status")
+async def update_booking_status(booking_id: str, status: str, user: dict = Depends(get_current_user)):
+    if status not in ["pending", "confirmed", "completed", "cancelled"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    result = await db.bookings.update_one({"id": booking_id}, {"$set": {"status": status}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    return {"message": f"Booking status updated to {status}"}
 
 # ================== TESTIMONIALS ROUTES ==================
 
