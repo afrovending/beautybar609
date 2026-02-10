@@ -106,7 +106,7 @@ class PriceCategoryCreate(BaseModel):
 class HomeBookingRequest(BaseModel):
     name: str
     phone: str
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     address: str
     service: str
     preferred_date: str
