@@ -463,7 +463,7 @@ const Prices = ({ salonPrices, homePrices }) => {
               }`}
               data-testid="home-toggle"
             >
-              <Home size={18} />
+              <HomeIcon size={18} />
               Home Service
             </button>
           </div>
