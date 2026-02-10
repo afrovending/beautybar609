@@ -476,7 +476,7 @@ const Prices = ({ salonPrices, homePrices }) => {
             className="bg-gold-400/10 border border-gold-400/30 p-4 mb-8 text-center"
           >
             <p className="text-gold-300 text-sm">
-              <Home size={16} className="inline mr-2" />
+              <HomeIcon size={16} className="inline mr-2" />
               Home service prices include transport within Lagos. We come to you!
             </p>
           </motion.div>
