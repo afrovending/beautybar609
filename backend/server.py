@@ -683,7 +683,8 @@ async def seed_data(user: dict = Depends(get_current_user)):
     # Seed prices if empty
     if await db.prices.count_documents({}) == 0:
         prices = [
-            {"id": str(uuid.uuid4()), "category": "NAILS", "items": [
+            # Salon prices
+            {"id": str(uuid.uuid4()), "category": "NAILS", "service_type": "salon", "items": [
                 {"name": "Gel Extensions (Short)", "price": "₦15,000"},
                 {"name": "Gel Extensions (Medium)", "price": "₦18,000"},
                 {"name": "Gel Extensions (Long)", "price": "₦22,000"},
@@ -691,19 +692,42 @@ async def seed_data(user: dict = Depends(get_current_user)):
                 {"name": "Nail Art (per nail)", "price": "₦500"},
                 {"name": "Gel Polish Only", "price": "₦8,000"},
             ], "order": 0, "created_at": datetime.now(timezone.utc).isoformat()},
-            {"id": str(uuid.uuid4()), "category": "LASHES", "items": [
+            {"id": str(uuid.uuid4()), "category": "LASHES", "service_type": "salon", "items": [
                 {"name": "Classic Lashes", "price": "₦20,000"},
                 {"name": "Volume Lashes", "price": "₦25,000"},
                 {"name": "Mega Volume", "price": "₦30,000"},
                 {"name": "Lash Lift & Tint", "price": "₦15,000"},
                 {"name": "Lash Removal", "price": "₦3,000"},
             ], "order": 1, "created_at": datetime.now(timezone.utc).isoformat()},
-            {"id": str(uuid.uuid4()), "category": "BROWS & BEAUTY", "items": [
+            {"id": str(uuid.uuid4()), "category": "BROWS & BEAUTY", "service_type": "salon", "items": [
                 {"name": "Brow Lamination", "price": "₦12,000"},
                 {"name": "Brow Tint", "price": "₦5,000"},
                 {"name": "Microblading", "price": "₦80,000"},
                 {"name": "Microshading", "price": "₦85,000"},
                 {"name": "Semi-Permanent Tattoo", "price": "From ₦30,000"},
+            ], "order": 2, "created_at": datetime.now(timezone.utc).isoformat()},
+            # Home service prices (includes transport fee)
+            {"id": str(uuid.uuid4()), "category": "NAILS", "service_type": "home", "items": [
+                {"name": "Gel Extensions (Short)", "price": "₦22,000"},
+                {"name": "Gel Extensions (Medium)", "price": "₦25,000"},
+                {"name": "Gel Extensions (Long)", "price": "₦29,000"},
+                {"name": "Acrylic Full Set", "price": "₦32,000"},
+                {"name": "Nail Art (per nail)", "price": "₦500"},
+                {"name": "Gel Polish Only", "price": "₦15,000"},
+            ], "order": 0, "created_at": datetime.now(timezone.utc).isoformat()},
+            {"id": str(uuid.uuid4()), "category": "LASHES", "service_type": "home", "items": [
+                {"name": "Classic Lashes", "price": "₦27,000"},
+                {"name": "Volume Lashes", "price": "₦32,000"},
+                {"name": "Mega Volume", "price": "₦37,000"},
+                {"name": "Lash Lift & Tint", "price": "₦22,000"},
+                {"name": "Lash Removal", "price": "₦5,000"},
+            ], "order": 1, "created_at": datetime.now(timezone.utc).isoformat()},
+            {"id": str(uuid.uuid4()), "category": "BROWS & BEAUTY", "service_type": "home", "items": [
+                {"name": "Brow Lamination", "price": "₦19,000"},
+                {"name": "Brow Tint", "price": "₦10,000"},
+                {"name": "Microblading", "price": "₦90,000"},
+                {"name": "Microshading", "price": "₦95,000"},
+                {"name": "Semi-Permanent Tattoo", "price": "From ₦40,000"},
             ], "order": 2, "created_at": datetime.now(timezone.utc).isoformat()},
         ]
         await db.prices.insert_many(prices)
