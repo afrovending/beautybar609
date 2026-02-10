@@ -223,10 +223,10 @@ def send_sms_notification(phone: str, message: str) -> bool:
     url = "https://api.ng.termii.com/api/sms/send"
     payload = {
         "to": phone_formatted,
-        "from": TERMII_SENDER_ID,
+        "from": "talert",
         "sms": message,
         "type": "plain",
-        "channel": "generic",
+        "channel": "dnd",
         "api_key": TERMII_API_KEY
     }
     
@@ -234,7 +234,7 @@ def send_sms_notification(phone: str, message: str) -> bool:
         response = requests.post(url, json=payload)
         result = response.json()
         logger.info(f"Termii SMS response: {result}")
-        if result.get("code") == "ok" or response.status_code == 200:
+        if result.get("code") == "ok" or result.get("message_id"):
             logger.info(f"SMS sent successfully to {phone_formatted}")
             return True
         else:
