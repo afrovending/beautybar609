@@ -134,6 +134,62 @@ def create_token(user_id: str, email: str) -> str:
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
+# ================== EMAIL HELPERS ==================
+
+def send_password_reset_email(to_email: str, reset_token: str, user_name: str = "User") -> bool:
+    """Send password reset email via SendGrid"""
+    if not SENDGRID_API_KEY:
+        logger.warning("SendGrid API key not configured, skipping email")
+        return False
+    
+    reset_link = f"{FRONTEND_URL}/admin?reset_token={reset_token}"
+    
+    html_content = f"""
+    <html>
+    <body style="font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #050505; color: #F9F1D8; padding: 40px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #0F0F0F; padding: 40px; border: 1px solid #333;">
+            <h1 style="color: #D4AF37; font-family: Georgia, serif; margin-bottom: 20px;">BeautyBar609</h1>
+            <h2 style="color: #F9F1D8; margin-bottom: 30px;">Password Reset Request</h2>
+            
+            <p style="color: #ccc; line-height: 1.6;">Hi {user_name},</p>
+            
+            <p style="color: #ccc; line-height: 1.6;">We received a request to reset your password. Click the button below to create a new password:</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{reset_link}" style="background-color: #D4AF37; color: #050505; padding: 15px 30px; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Reset Password</a>
+            </div>
+            
+            <p style="color: #888; font-size: 14px;">Or copy this link: <span style="color: #D4AF37;">{reset_link}</span></p>
+            
+            <p style="color: #888; font-size: 14px; margin-top: 30px;">This link expires in 1 hour. If you didn't request this reset, you can safely ignore this email.</p>
+            
+            <hr style="border: none; border-top: 1px solid #333; margin: 30px 0;">
+            
+            <p style="color: #666; font-size: 12px; text-align: center;">
+                BeautyBar609 - Glow From Lashes To Tips<br>
+                57, Arowolo Street, Off Agbe Road, Abule Egba
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    message = Mail(
+        from_email=SENDER_EMAIL,
+        to_emails=to_email,
+        subject="Reset Your BeautyBar609 Password",
+        html_content=html_content
+    )
+    
+    try:
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
+        logger.info(f"Password reset email sent to {to_email}, status: {response.status_code}")
+        return response.status_code == 202
+    except Exception as e:
+        logger.error(f"Failed to send password reset email: {str(e)}")
+        return False
+
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
