@@ -353,7 +353,11 @@ async def delete_service(service_id: str, user: dict = Depends(get_current_user)
 async def get_prices(service_type: Optional[str] = None):
     query = {}
     if service_type:
-        query["service_type"] = service_type
+        if service_type == "salon":
+            # Include prices without service_type (legacy) or with service_type=salon
+            query["$or"] = [{"service_type": "salon"}, {"service_type": {"$exists": False}}]
+        else:
+            query["service_type"] = service_type
     prices = await db.prices.find(query, {"_id": 0}).sort("order", 1).to_list(100)
     return prices
 
