@@ -20,7 +20,15 @@ import {
   Upload,
   Star,
   Menu,
-  ChevronLeft
+  ChevronLeft,
+  Calendar,
+  Phone,
+  MapPin,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  MessageCircle
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -29,6 +37,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const Sidebar = ({ activeTab, setActiveTab, onLogout, isMobileOpen, setIsMobileOpen }) => {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'bookings', label: 'Bookings', icon: Calendar },
     { id: 'services', label: 'Services', icon: Scissors },
     { id: 'prices', label: 'Price List', icon: DollarSign },
     { id: 'testimonials', label: 'Testimonials', icon: MessageSquare },
