@@ -1018,10 +1018,11 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-center md:text-left">
-            <h3 className="font-serif text-3xl text-gold-400 mb-2">
-              BeautyBar<span className="text-gold-200">609</span>
-            </h3>
-            <p className="text-neutral-500 text-sm">Glow From Lashes To Tips</p>
+            <img 
+              src="https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/nbyqhzyo_0ef53d8c-57e2-4eb2-8a45-5f7c275229bd.jpeg" 
+              alt="BeautyBar609" 
+              className="h-20 w-auto mx-auto md:mx-0"
+            />
           </div>
 
           <div className="flex gap-6">
