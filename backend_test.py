@@ -533,6 +533,11 @@ class BeautyBar609AdminTester:
         
         # Seed data test
         self.test_seed_data()
+
+        # HOME SERVICES FEATURE TESTS (NEW)
+        print("\n🏠 Testing New Home Services Feature...")
+        self.test_home_service_prices()
+        self.test_home_booking_api()
         
         # Cleanup
         self.cleanup_test_data()
