@@ -1234,6 +1234,7 @@ const AdminDashboard = () => {
   const renderTab = () => {
     switch (activeTab) {
       case 'overview': return <OverviewTab />;
+      case 'bookings': return <BookingsTab />;
       case 'services': return <ServicesTab />;
       case 'prices': return <PricesTab />;
       case 'testimonials': return <TestimonialsTab />;
