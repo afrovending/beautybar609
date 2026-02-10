@@ -396,8 +396,11 @@ const Gallery = ({ images }) => {
   );
 };
 
-// Prices Section
-const Prices = ({ priceList }) => {
+// Prices Section with Service Type Toggle
+const Prices = ({ salonPrices, homePrices }) => {
+  const [serviceType, setServiceType] = useState('salon');
+  const priceList = serviceType === 'salon' ? salonPrices : homePrices;
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -430,6 +433,55 @@ const Prices = ({ priceList }) => {
           </motion.h2>
         </motion.div>
 
+        {/* Service Type Toggle */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+          className="flex justify-center mb-12"
+        >
+          <div className="inline-flex bg-charcoal border border-white/10 p-1">
+            <button
+              onClick={() => setServiceType('salon')}
+              className={`flex items-center gap-2 px-6 py-3 text-sm uppercase tracking-wider transition-all ${
+                serviceType === 'salon'
+                  ? 'bg-gold-400 text-obsidian font-bold'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+              data-testid="salon-toggle"
+            >
+              <Building2 size={18} />
+              Salon
+            </button>
+            <button
+              onClick={() => setServiceType('home')}
+              className={`flex items-center gap-2 px-6 py-3 text-sm uppercase tracking-wider transition-all ${
+                serviceType === 'home'
+                  ? 'bg-gold-400 text-obsidian font-bold'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+              data-testid="home-toggle"
+            >
+              <Home size={18} />
+              Home Service
+            </button>
+          </div>
+        </motion.div>
+
+        {serviceType === 'home' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gold-400/10 border border-gold-400/30 p-4 mb-8 text-center"
+          >
+            <p className="text-gold-300 text-sm">
+              <Home size={16} className="inline mr-2" />
+              Home service prices include transport within Lagos. We come to you!
+            </p>
+          </motion.div>
+        )}
+
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -437,25 +489,35 @@ const Prices = ({ priceList }) => {
           variants={staggerContainer}
           className="space-y-12"
         >
-          {priceList.map((category, catIndex) => (
-            <motion.div key={catIndex} variants={fadeInUp} data-testid={`price-category-${catIndex}`}>
-              <h3 className="font-serif text-xl text-gold-400 mb-6 pb-2 border-b border-gold-400/20">
-                {category.category}
-              </h3>
-              <div className="space-y-0">
-                {category.items.map((item, itemIndex) => (
-                  <div
-                    key={itemIndex}
-                    className="price-row flex justify-between items-center py-4 border-b border-white/5"
-                    data-testid={`price-item-${catIndex}-${itemIndex}`}
-                  >
-                    <span className="text-neutral-300">{item.name}</span>
-                    <span className="text-gold-300 font-medium">{item.price}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          ))}
+          <AnimatePresence mode="wait">
+            {priceList.map((category, catIndex) => (
+              <motion.div 
+                key={`${serviceType}-${catIndex}`} 
+                variants={fadeInUp} 
+                data-testid={`price-category-${catIndex}`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h3 className="font-serif text-xl text-gold-400 mb-6 pb-2 border-b border-gold-400/20">
+                  {category.category}
+                </h3>
+                <div className="space-y-0">
+                  {category.items.map((item, itemIndex) => (
+                    <div
+                      key={itemIndex}
+                      className="price-row flex justify-between items-center py-4 border-b border-white/5"
+                      data-testid={`price-item-${catIndex}-${itemIndex}`}
+                    >
+                      <span className="text-neutral-300">{item.name}</span>
+                      <span className="text-gold-300 font-medium">{item.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </motion.div>
 
         <motion.p
@@ -467,7 +529,27 @@ const Prices = ({ priceList }) => {
         >
           * Prices may vary based on design complexity. Contact us for custom quotes.
         </motion.p>
+
+        {serviceType === 'home' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 text-center"
+          >
+            <a
+              href="#book-home"
+              className="inline-flex items-center gap-2 bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-8 py-4 hover:bg-gold-300 transition-colors"
+              data-testid="book-home-service-btn"
+            >
+              <Calendar size={18} />
+              Book Home Service
+            </a>
+          </motion.div>
+        )}
       </div>
+    </section>
+  );
+};
     </section>
   );
 };
