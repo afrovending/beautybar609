@@ -121,8 +121,12 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 glass-effect" data-testid="navigation">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="flex items-center justify-between h-20">
-          <a href="#hero" className="font-serif text-2xl text-gold-400" data-testid="logo">
-            BeautyBar<span className="text-gold-200">609</span>
+          <a href="#hero" className="flex items-center" data-testid="logo">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/nbyqhzyo_0ef53d8c-57e2-4eb2-8a45-5f7c275229bd.jpeg" 
+              alt="BeautyBar609" 
+              className="h-14 w-auto"
+            />
           </a>
           
           <div className="hidden md:flex items-center gap-8">
