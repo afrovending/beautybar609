@@ -552,6 +552,29 @@ const Contact = () => {
   );
 };
 
+// WhatsApp Floating Button
+const WhatsAppFloat = () => {
+  return (
+    <motion.a
+      href="https://wa.me/2348058578131?text=Hi!%20I'd%20like%20to%20book%20an%20appointment%20at%20BeautyBar609"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay: 1, duration: 0.3 }}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+      data-testid="whatsapp-float-btn"
+    >
+      <MessageCircle size={28} fill="white" />
+      <span className="absolute -top-2 -right-2 bg-gold-400 text-obsidian text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+        Chat
+      </span>
+    </motion.a>
+  );
+};
+
 // Footer
 const Footer = () => {
   return (
