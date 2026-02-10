@@ -47,6 +47,13 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordReset(BaseModel):
+    token: str
+    new_password: str
+
 class UserResponse(BaseModel):
     id: str
     email: str
@@ -153,6 +160,58 @@ async def login(credentials: UserLogin):
 @api_router.get("/auth/me")
 async def get_me(user: dict = Depends(get_current_user)):
     return {"id": user["id"], "email": user["email"], "name": user["name"]}
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(request: PasswordResetRequest):
+    user = await db.users.find_one({"email": request.email})
+    if not user:
+        # Don't reveal if email exists
+        return {"message": "If email exists, reset instructions sent"}
+    
+    # Generate reset token (valid for 1 hour)
+    reset_token = str(uuid.uuid4())
+    expires = datetime.now(timezone.utc) + timedelta(hours=1)
+    
+    await db.password_resets.insert_one({
+        "user_id": user["id"],
+        "token": reset_token,
+        "expires": expires.isoformat(),
+        "used": False
+    })
+    
+    # In production, send email here. For now, return token for testing
+    logger.info(f"Password reset token for {request.email}: {reset_token}")
+    return {"message": "If email exists, reset instructions sent", "reset_token": reset_token}
+
+@api_router.post("/auth/reset-password")
+async def reset_password(request: PasswordReset):
+    reset_doc = await db.password_resets.find_one({
+        "token": request.token,
+        "used": False
+    })
+    
+    if not reset_doc:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+    
+    # Check if token expired
+    expires = datetime.fromisoformat(reset_doc["expires"])
+    if datetime.now(timezone.utc) > expires:
+        raise HTTPException(status_code=400, detail="Reset token expired")
+    
+    # Update password
+    new_hash = hash_password(request.new_password)
+    await db.users.update_one(
+        {"id": reset_doc["user_id"]},
+        {"$set": {"password": new_hash}}
+    )
+    
+    # Mark token as used
+    await db.password_resets.update_one(
+        {"token": request.token},
+        {"$set": {"used": True}}
+    )
+    
+    return {"message": "Password reset successfully"}
 
 # ================== SERVICES ROUTES ==================
 
