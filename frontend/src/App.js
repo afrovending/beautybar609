@@ -123,9 +123,9 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-20">
           <a href="#hero" className="flex items-center" data-testid="logo">
             <img 
-              src="https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/nbyqhzyo_0ef53d8c-57e2-4eb2-8a45-5f7c275229bd.jpeg" 
+              src="https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/ybuu6n1s_New%20Logo.png" 
               alt="BeautyBar609" 
-              className="h-14 w-auto"
+              className="h-16 w-auto"
             />
           </a>
           
