@@ -206,6 +206,44 @@ def send_password_reset_email(to_email: str, reset_token: str, user_name: str = 
         logger.error(f"Failed to send password reset email: {str(e)}")
         return False
 
+def send_sms_notification(phone: str, message: str) -> bool:
+    """Send SMS via Termii API"""
+    if not TERMII_API_KEY:
+        logger.warning("Termii API key not configured, skipping SMS")
+        return False
+    
+    # Format phone number for Nigeria
+    phone_formatted = phone.replace(" ", "").replace("-", "")
+    if phone_formatted.startswith("0"):
+        phone_formatted = "234" + phone_formatted[1:]
+    elif not phone_formatted.startswith("234") and not phone_formatted.startswith("+234"):
+        phone_formatted = "234" + phone_formatted
+    phone_formatted = phone_formatted.replace("+", "")
+    
+    url = "https://api.ng.termii.com/api/sms/send"
+    payload = {
+        "to": phone_formatted,
+        "from": TERMII_SENDER_ID,
+        "sms": message,
+        "type": "plain",
+        "channel": "generic",
+        "api_key": TERMII_API_KEY
+    }
+    
+    try:
+        response = requests.post(url, json=payload)
+        result = response.json()
+        logger.info(f"Termii SMS response: {result}")
+        if result.get("code") == "ok" or response.status_code == 200:
+            logger.info(f"SMS sent successfully to {phone_formatted}")
+            return True
+        else:
+            logger.error(f"SMS failed: {result}")
+            return False
+    except Exception as e:
+        logger.error(f"Failed to send SMS: {str(e)}")
+        return False
+
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
