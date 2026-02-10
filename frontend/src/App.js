@@ -17,7 +17,7 @@ import {
   Menu,
   X,
   Sparkles,
-  Home,
+  Home as HomeIcon,
   Building2,
   Calendar,
   Clock,
