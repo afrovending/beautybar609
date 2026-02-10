@@ -1019,9 +1019,9 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-center md:text-left">
             <img 
-              src="https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/nbyqhzyo_0ef53d8c-57e2-4eb2-8a45-5f7c275229bd.jpeg" 
+              src="https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/ybuu6n1s_New%20Logo.png" 
               alt="BeautyBar609" 
-              className="h-20 w-auto mx-auto md:mx-0"
+              className="h-24 w-auto mx-auto md:mx-0"
             />
           </div>
 
