@@ -12,7 +12,7 @@ from datetime import datetime
 import uuid
 
 class BeautyBar609AdminTester:
-    def __init__(self, base_url="https://beauty-hub-266.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://beauty-portal-pro.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.token = None
         self.headers = {'Content-Type': 'application/json'}
