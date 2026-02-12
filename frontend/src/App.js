@@ -141,7 +141,6 @@ const Navigation = () => {
               src="/logo.png" 
               alt="BeautyBar609" 
               className="h-14 w-auto"
-              onError={(e) => { e.target.src = 'https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/ybuu6n1s_New%20Logo.png'; }}
             />
           </a>
           
@@ -1464,7 +1463,6 @@ const Footer = () => {
               src="/logo.png" 
               alt="BeautyBar609" 
               className="h-20 w-auto mx-auto md:mx-0"
-              onError={(e) => { e.target.src = 'https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/ybuu6n1s_New%20Logo.png'; }}
             />
           </div>
 
