@@ -23,7 +23,17 @@ import {
   Clock,
   User,
   Send,
-  CheckCircle
+  CheckCircle,
+  Award,
+  Users,
+  Shield,
+  Heart,
+  Play,
+  Quote,
+  Crown,
+  Zap,
+  Gift,
+  ArrowRight
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -65,22 +75,15 @@ const fallbackPriceList = [
     { name: "Gel Extensions (Medium)", price: "₦18,000" },
     { name: "Gel Extensions (Long)", price: "₦22,000" },
     { name: "Acrylic Full Set", price: "₦25,000" },
-    { name: "Nail Art (per nail)", price: "₦500" },
-    { name: "Gel Polish Only", price: "₦8,000" },
   ]},
   { category: "LASHES", items: [
     { name: "Classic Lashes", price: "₦20,000" },
     { name: "Volume Lashes", price: "₦25,000" },
     { name: "Mega Volume", price: "₦30,000" },
-    { name: "Lash Lift & Tint", price: "₦15,000" },
-    { name: "Lash Removal", price: "₦3,000" },
   ]},
   { category: "BROWS & BEAUTY", items: [
     { name: "Brow Lamination", price: "₦12,000" },
-    { name: "Brow Tint", price: "₦5,000" },
     { name: "Microblading", price: "₦80,000" },
-    { name: "Microshading", price: "₦85,000" },
-    { name: "Semi-Permanent Tattoo", price: "From ₦30,000" },
   ]}
 ];
 
@@ -112,20 +115,33 @@ const staggerContainer = {
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } }
+};
+
 // Navigation Component
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const navLinks = ["Services", "Gallery", "Prices", "Reviews", "Contact"];
 
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-effect" data-testid="navigation">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass-effect py-2' : 'py-4'}`} data-testid="navigation">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16">
           <a href="#hero" className="flex items-center" data-testid="logo">
             <img 
-              src="https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/ybuu6n1s_New%20Logo.png" 
+              src="/logo.png" 
               alt="BeautyBar609" 
-              className="h-16 w-auto"
+              className="h-14 w-auto"
+              onError={(e) => { e.target.src = 'https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/ybuu6n1s_New%20Logo.png'; }}
             />
           </a>
           
@@ -140,6 +156,15 @@ const Navigation = () => {
                 {link}
               </a>
             ))}
+            <a
+              href="https://wa.me/2348058578131"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gold-400 text-obsidian font-bold text-sm uppercase tracking-wider px-6 py-3 hover:bg-gold-300 transition-colors"
+              data-testid="nav-book-btn"
+            >
+              Book VIP
+            </a>
           </div>
 
           <button
@@ -170,6 +195,14 @@ const Navigation = () => {
                 {link}
               </a>
             ))}
+            <a
+              href="https://wa.me/2348058578131"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gold-400 text-obsidian font-bold text-sm uppercase tracking-wider px-6 py-3 text-center"
+            >
+              Book VIP
+            </a>
           </div>
         </motion.div>
       )}
@@ -177,7 +210,7 @@ const Navigation = () => {
   );
 };
 
-// Hero Section
+// Authority Hero Section (First Impression Psychology)
 const Hero = () => {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -201,38 +234,58 @@ const Hero = () => {
         <div className="hero-overlay absolute inset-0" />
       </motion.div>
 
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
         >
+          {/* 5-Star Badge */}
+          <motion.div variants={fadeInUp} className="flex items-center justify-center gap-2 mb-6">
+            <div className="flex gap-1">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} size={18} className="fill-gold-400 text-gold-400" />
+              ))}
+            </div>
+            <span className="text-gold-300 text-sm uppercase tracking-wider">500+ Happy Clients</span>
+          </motion.div>
+
           <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.3em] text-gold-400 mb-6">
-            Premium Beauty Services
+            Premium Beauty Experience
           </motion.p>
-          <motion.h1 variants={fadeInUp} className="font-serif text-5xl md:text-7xl lg:text-8xl text-gold-100 mb-6 leading-tight">
-            Beauty<span className="text-gold-400">Bar</span>609
+          
+          {/* Transformation-Focused Headline */}
+          <motion.h1 variants={fadeInUp} className="font-serif text-4xl md:text-6xl lg:text-7xl text-white mb-6 leading-tight">
+            Flawless Natural Beauty
+            <span className="block text-gold-400 mt-2">— Designed Around You</span>
           </motion.h1>
-          <motion.p variants={fadeInUp} className="font-serif text-xl md:text-2xl text-gold-300 italic mb-12">
-            Glow From Lashes To Tips
+          
+          <motion.p variants={fadeInUp} className="font-serif text-lg md:text-xl text-gold-200 italic mb-4">
+            The BeautyBar609 Signature Method™
           </motion.p>
+          
+          <motion.p variants={fadeInUp} className="text-neutral-400 max-w-2xl mx-auto mb-10 text-base">
+            Where artistry meets precision. Experience transformations that enhance your natural beauty and boost your confidence.
+          </motion.p>
+
           <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="#services"
-              className="bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-8 py-4 hover:bg-gold-300 transition-colors duration-300"
-              data-testid="explore-services-btn"
-            >
-              Explore Services
-            </a>
             <a
               href="https://wa.me/2348058578131"
               target="_blank"
               rel="noopener noreferrer"
-              className="border border-gold-400 text-gold-400 hover:bg-gold-400 hover:text-obsidian uppercase tracking-wider px-8 py-4 transition-all duration-300 flex items-center justify-center gap-2"
-              data-testid="book-now-btn"
+              className="bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-10 py-5 hover:bg-gold-300 transition-colors duration-300 flex items-center justify-center gap-3 text-lg"
+              data-testid="book-vip-btn"
             >
-              <MessageCircle size={18} />
-              Book Now
+              <Crown size={22} />
+              Book VIP Appointment
+            </a>
+            <a
+              href="#transformations"
+              className="border-2 border-gold-400 text-gold-400 hover:bg-gold-400/10 uppercase tracking-wider px-10 py-5 transition-all duration-300 flex items-center justify-center gap-2"
+              data-testid="see-results-btn"
+            >
+              See Results
+              <ArrowRight size={18} />
             </a>
           </motion.div>
         </motion.div>
@@ -249,7 +302,183 @@ const Hero = () => {
   );
 };
 
-// Services Section
+// Instant Trust Builders Section (Within First 5 Seconds)
+const TrustBuilders = () => {
+  const stats = [
+    { icon: Users, value: "500+", label: "Happy Clients" },
+    { icon: Award, value: "5+", label: "Years Experience" },
+    { icon: Star, value: "5.0", label: "Google Rating" },
+    { icon: Shield, value: "100%", label: "Hygiene Certified" },
+  ];
+
+  return (
+    <section className="py-8 md:py-12 bg-charcoal border-y border-gold-400/20" data-testid="trust-builders">
+      <div className="max-w-6xl mx-auto px-6">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8"
+        >
+          {stats.map((stat, index) => (
+            <motion.div
+              key={index}
+              variants={fadeInUp}
+              className="text-center"
+              data-testid={`trust-stat-${index}`}
+            >
+              <stat.icon className="text-gold-400 mx-auto mb-3" size={28} />
+              <p className="text-3xl md:text-4xl font-bold text-white mb-1">{stat.value}</p>
+              <p className="text-xs uppercase tracking-wider text-neutral-400">{stat.label}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Transformation-Driven Visual Storytelling (Before/After)
+const Transformations = () => {
+  const transformations = [
+    {
+      before: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=85&w=400&auto=format&fit=crop",
+      after: "https://images.unsplash.com/photo-1594461287652-10b41090cf91?q=85&w=400&auto=format&fit=crop",
+      service: "Lash Extensions",
+      story: "From sparse lashes to stunning volume"
+    },
+    {
+      before: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=85&w=400&auto=format&fit=crop",
+      after: "https://images.unsplash.com/photo-1516691475576-56cf13710ae9?q=85&w=400&auto=format&fit=crop",
+      service: "Nail Extensions",
+      story: "Natural nails transformed into art"
+    },
+    {
+      before: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=85&w=400&auto=format&fit=crop",
+      after: "https://images.unsplash.com/photo-1755274556662-d37485f0677d?q=85&w=400&auto=format&fit=crop",
+      service: "Brow Lamination",
+      story: "Undefined brows to perfect arches"
+    }
+  ];
+
+  return (
+    <section id="transformations" className="py-20 md:py-28 px-6 md:px-12 bg-obsidian" data-testid="transformations-section">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <Sparkles size={16} className="text-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Real Results</span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-white mb-4">
+            See The <span className="text-gold-400">Transformation</span>
+          </motion.h2>
+          <motion.p variants={fadeInUp} className="text-neutral-400 max-w-2xl mx-auto">
+            Every client leaves feeling more confident. Here's proof of the BeautyBar609 difference.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          {transformations.map((item, index) => (
+            <motion.div
+              key={index}
+              variants={fadeInUp}
+              className="group relative bg-charcoal border border-white/5 hover:border-gold-400/50 transition-all duration-500 overflow-hidden"
+              data-testid={`transformation-${index}`}
+            >
+              <div className="grid grid-cols-2">
+                <div className="relative">
+                  <img src={item.before} alt="Before" className="w-full h-48 object-cover" />
+                  <span className="absolute bottom-2 left-2 bg-obsidian/80 px-2 py-1 text-xs uppercase text-neutral-400">Before</span>
+                </div>
+                <div className="relative">
+                  <img src={item.after} alt="After" className="w-full h-48 object-cover" />
+                  <span className="absolute bottom-2 right-2 bg-gold-400 px-2 py-1 text-xs uppercase text-obsidian font-bold">After</span>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="font-serif text-xl text-white mb-2">{item.service}</h3>
+                <p className="text-neutral-400 text-sm">{item.story}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Signature Method Positioning
+const SignatureMethod = () => {
+  const steps = [
+    { icon: Heart, title: "Personal Consultation", desc: "We understand your unique style and preferences" },
+    { icon: Sparkles, title: "Custom Design", desc: "Tailored treatment plan for your desired look" },
+    { icon: Award, title: "Expert Execution", desc: "Precision application using premium products" },
+    { icon: Crown, title: "Lasting Results", desc: "Aftercare guidance for long-lasting beauty" },
+  ];
+
+  return (
+    <section className="py-20 md:py-28 px-6 md:px-12 bg-charcoal" data-testid="signature-method">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <Crown size={16} className="text-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Our Approach</span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-white mb-4">
+            The BeautyBar609 <span className="text-gold-400">Signature Method™</span>
+          </motion.h2>
+          <motion.p variants={fadeInUp} className="text-neutral-400 max-w-2xl mx-auto">
+            Our unique 4-step process ensures every client receives a personalized, luxury experience with results that speak for themselves.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-4 gap-6"
+        >
+          {steps.map((step, index) => (
+            <motion.div
+              key={index}
+              variants={fadeInUp}
+              className="relative text-center p-8 bg-obsidian border border-white/5 hover:border-gold-400/50 transition-all group"
+            >
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gold-400 text-obsidian w-8 h-8 flex items-center justify-center font-bold">
+                {index + 1}
+              </div>
+              <step.icon className="text-gold-400 mx-auto mb-4 group-hover:scale-110 transition-transform" size={32} />
+              <h3 className="font-serif text-lg text-white mb-2">{step.title}</h3>
+              <p className="text-neutral-500 text-sm">{step.desc}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Curated Services Section (Decision Simplification - 3-4 Premium Categories)
 const Services = ({ services }) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -266,7 +495,7 @@ const Services = ({ services }) => {
   }, []);
 
   return (
-    <section id="services" className="py-24 md:py-32 px-6 md:px-12 bg-obsidian" data-testid="services-section">
+    <section id="services" className="py-20 md:py-28 px-6 md:px-12 bg-obsidian" data-testid="services-section">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial="hidden"
@@ -275,12 +504,16 @@ const Services = ({ services }) => {
           variants={staggerContainer}
           className="text-center mb-16"
         >
-          <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.2em] text-gold-400 mb-4">
-            What We Offer
-          </motion.p>
-          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-gold-100">
-            Our Services
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <Sparkles size={16} className="text-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Premium Services</span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-white mb-4">
+            Curated <span className="text-gold-400">Beauty Menu</span>
           </motion.h2>
+          <motion.p variants={fadeInUp} className="text-neutral-400 max-w-2xl mx-auto">
+            Each service is carefully designed to enhance your natural beauty using premium products and expert techniques.
+          </motion.p>
         </motion.div>
 
         <motion.div
@@ -290,11 +523,11 @@ const Services = ({ services }) => {
           variants={staggerContainer}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {services.map((service, index) => (
+          {services.slice(0, 4).map((service, index) => (
             <motion.div
               key={service.id || index}
               variants={fadeInUp}
-              className="service-card group relative h-[400px] bg-charcoal border border-white/5 hover:border-gold-400/50 transition-colors duration-500"
+              className="service-card group relative h-[450px] bg-charcoal border border-white/5 hover:border-gold-400/50 transition-colors duration-500 overflow-hidden"
               data-testid={`service-card-${index}`}
             >
               <img
@@ -302,15 +535,112 @@ const Services = ({ services }) => {
                 alt={service.title}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/60 to-transparent" />
               <div className="absolute inset-0 z-10 p-6 flex flex-col justify-end">
                 <p className="text-xs uppercase tracking-widest text-gold-400 mb-2">{service.price}</p>
                 <h3 className="font-serif text-2xl text-white mb-2">{service.title}</h3>
-                <p className="text-sm text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <p className="text-sm text-neutral-400 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   {service.description}
                 </p>
+                <a
+                  href="https://wa.me/2348058578131"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-gold-400 text-sm uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  Book Now <ArrowRight size={14} />
+                </a>
               </div>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* Urgency Message */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+          className="mt-12 text-center"
+        >
+          <div className="inline-flex items-center gap-2 bg-gold-400/10 border border-gold-400/30 px-6 py-3">
+            <Zap size={18} className="text-gold-400" />
+            <span className="text-gold-300 text-sm">Appointments fill quickly — Book your spot today!</span>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Expert Authority Section (Human Trust Psychology)
+const ExpertAuthority = () => {
+  return (
+    <section className="py-20 md:py-28 px-6 md:px-12 bg-charcoal" data-testid="expert-authority">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
+        >
+          <motion.div variants={fadeInUp} className="relative">
+            <img
+              src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=85&w=600&auto=format&fit=crop"
+              alt="BeautyBar609 Expert"
+              className="w-full h-[500px] object-cover"
+            />
+            <div className="absolute -bottom-6 -right-6 bg-gold-400 p-6">
+              <p className="text-obsidian font-bold text-4xl">5+</p>
+              <p className="text-obsidian text-sm uppercase tracking-wider">Years Expert</p>
+            </div>
+          </motion.div>
+
+          <motion.div variants={fadeInUp}>
+            <div className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+              <Award size={16} className="text-gold-400" />
+              <span className="text-xs uppercase tracking-widest text-gold-400">Meet The Expert</span>
+            </div>
+            <h2 className="font-serif text-3xl md:text-4xl text-white mb-6">
+              Passion Meets <span className="text-gold-400">Precision</span>
+            </h2>
+            <p className="text-neutral-400 mb-6 leading-relaxed">
+              At BeautyBar609, we believe every woman deserves to feel confident and beautiful. Our journey started with a simple mission: to provide premium beauty services that enhance natural beauty while delivering an exceptional experience.
+            </p>
+            <p className="text-neutral-400 mb-8 leading-relaxed">
+              With over 5 years of experience and training in the latest techniques, we've perfected our craft to deliver results that exceed expectations. Every treatment is performed with meticulous attention to detail using only premium, certified products.
+            </p>
+            
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="flex items-center gap-3">
+                <CheckCircle size={20} className="text-gold-400" />
+                <span className="text-neutral-300 text-sm">Certified Professional</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle size={20} className="text-gold-400" />
+                <span className="text-neutral-300 text-sm">Premium Products Only</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle size={20} className="text-gold-400" />
+                <span className="text-neutral-300 text-sm">500+ Satisfied Clients</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle size={20} className="text-gold-400" />
+                <span className="text-neutral-300 text-sm">Hygiene Guaranteed</span>
+              </div>
+            </div>
+
+            <a
+              href="https://wa.me/2348058578131"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-8 py-4 hover:bg-gold-300 transition-colors"
+            >
+              Book a Consultation
+              <ArrowRight size={18} />
+            </a>
+          </motion.div>
         </motion.div>
       </div>
     </section>
@@ -334,7 +664,7 @@ const Gallery = ({ images }) => {
   }, []);
 
   return (
-    <section id="gallery" className="py-24 md:py-32 px-6 md:px-12 bg-charcoal" data-testid="gallery-section">
+    <section id="gallery" className="py-20 md:py-28 px-6 md:px-12 bg-obsidian" data-testid="gallery-section">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial="hidden"
@@ -343,11 +673,12 @@ const Gallery = ({ images }) => {
           variants={staggerContainer}
           className="text-center mb-16"
         >
-          <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.2em] text-gold-400 mb-4">
-            Our Portfolio
-          </motion.p>
-          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-gold-100">
-            Gallery
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <Sparkles size={16} className="text-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Our Work</span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-white">
+            Portfolio <span className="text-gold-400">Gallery</span>
           </motion.h2>
         </motion.div>
 
@@ -364,13 +695,13 @@ const Gallery = ({ images }) => {
               <motion.div
                 key={index}
                 variants={fadeInUp}
-                className={`gallery-item ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
+                className={`gallery-item overflow-hidden ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
                 data-testid={`gallery-item-${index}`}
               >
                 <img
                   src={imgUrl}
                   alt={`Gallery ${index + 1}`}
-                  className={`w-full object-cover ${index === 0 ? 'h-full' : 'h-48 md:h-64'}`}
+                  className={`w-full object-cover hover:scale-105 transition-transform duration-500 ${index === 0 ? 'h-full' : 'h-48 md:h-64'}`}
                 />
               </motion.div>
             );
@@ -400,7 +731,154 @@ const Gallery = ({ images }) => {
   );
 };
 
-// Prices Section with Service Type Toggle
+// Social Proof Amplification (Testimonials)
+const Testimonials = ({ testimonials }) => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          trackView('reviews');
+        }
+      },
+      { threshold: 0.3 }
+    );
+    const el = document.getElementById('reviews');
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section id="reviews" className="py-20 md:py-28 bg-charcoal overflow-hidden" data-testid="testimonials-section">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <Star size={16} className="text-gold-400 fill-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Client Love</span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-white mb-4">
+            What Our <span className="text-gold-400">Clients Say</span>
+          </motion.h2>
+          <motion.div variants={fadeInUp} className="flex items-center justify-center gap-2">
+            <div className="flex gap-1">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} size={24} className="fill-gold-400 text-gold-400" />
+              ))}
+            </div>
+            <span className="text-white font-bold">5.0</span>
+            <span className="text-neutral-400">on Google Reviews</span>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      <div className="relative">
+        <div className="testimonial-track">
+          {[...testimonials, ...testimonials].map((testimonial, index) => (
+            <div
+              key={index}
+              className="flex-shrink-0 w-[380px] p-8 bg-obsidian border border-white/5"
+              data-testid={`testimonial-${index}`}
+            >
+              <Quote size={32} className="text-gold-400/30 mb-4" />
+              <div className="flex gap-1 mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <Star key={i} size={16} className="fill-gold-400 text-gold-400" />
+                ))}
+              </div>
+              <p className="text-neutral-300 mb-6 italic text-lg">"{testimonial.text}"</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gold-400 rounded-full flex items-center justify-center">
+                  <span className="text-obsidian font-bold">{testimonial.name.charAt(0)}</span>
+                </div>
+                <p className="text-gold-400 font-medium">{testimonial.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// VIP Membership Funnel
+const VIPMembership = () => {
+  const benefits = [
+    { icon: Crown, title: "Priority Booking", desc: "Skip the queue with exclusive appointment slots" },
+    { icon: Gift, title: "Member Pricing", desc: "Enjoy 15% off all services, always" },
+    { icon: Sparkles, title: "Free Touch-ups", desc: "Complimentary maintenance sessions included" },
+    { icon: Heart, title: "Birthday Treat", desc: "Special discount during your birthday month" },
+  ];
+
+  return (
+    <section className="py-20 md:py-28 px-6 md:px-12 bg-obsidian" data-testid="vip-membership">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="text-center mb-16"
+        >
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <Crown size={16} className="text-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Exclusive</span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-white mb-4">
+            Join the <span className="text-gold-400">VIP Club</span>
+          </motion.h2>
+          <motion.p variants={fadeInUp} className="text-neutral-400 max-w-2xl mx-auto">
+            Become a BeautyBar609 VIP member and enjoy exclusive benefits designed for our most valued clients.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+        >
+          {benefits.map((benefit, index) => (
+            <motion.div
+              key={index}
+              variants={fadeInUp}
+              className="text-center p-6 bg-charcoal border border-white/5 hover:border-gold-400/50 transition-all"
+            >
+              <benefit.icon className="text-gold-400 mx-auto mb-4" size={32} />
+              <h3 className="font-serif text-lg text-white mb-2">{benefit.title}</h3>
+              <p className="text-neutral-500 text-sm">{benefit.desc}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+          className="text-center"
+        >
+          <a
+            href="https://wa.me/2348058578131?text=Hi!%20I'm%20interested%20in%20the%20VIP%20membership"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-10 py-5 hover:bg-gold-300 transition-colors"
+          >
+            <Crown size={20} />
+            Become a VIP Member
+          </a>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Prices Section
 const Prices = ({ salonPrices, homePrices }) => {
   const [serviceType, setServiceType] = useState('salon');
   const priceList = serviceType === 'salon' ? salonPrices : homePrices;
@@ -420,7 +898,7 @@ const Prices = ({ salonPrices, homePrices }) => {
   }, []);
 
   return (
-    <section id="prices" className="py-24 md:py-32 px-6 md:px-12 bg-obsidian" data-testid="prices-section">
+    <section id="prices" className="py-20 md:py-28 px-6 md:px-12 bg-charcoal" data-testid="prices-section">
       <div className="max-w-5xl mx-auto">
         <motion.div
           initial="hidden"
@@ -429,11 +907,12 @@ const Prices = ({ salonPrices, homePrices }) => {
           variants={staggerContainer}
           className="text-center mb-16"
         >
-          <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.2em] text-gold-400 mb-4">
-            Our Rates
-          </motion.p>
-          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-gold-100">
-            Price List
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <Sparkles size={16} className="text-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Transparent Pricing</span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-white">
+            Investment in <span className="text-gold-400">Your Beauty</span>
           </motion.h2>
         </motion.div>
 
@@ -445,7 +924,7 @@ const Prices = ({ salonPrices, homePrices }) => {
           variants={fadeInUp}
           className="flex justify-center mb-12"
         >
-          <div className="inline-flex bg-charcoal border border-white/10 p-1">
+          <div className="inline-flex bg-obsidian border border-white/10 p-1">
             <button
               onClick={() => setServiceType('salon')}
               className={`flex items-center gap-2 px-6 py-3 text-sm uppercase tracking-wider transition-all ${
@@ -533,23 +1012,6 @@ const Prices = ({ salonPrices, homePrices }) => {
         >
           * Prices may vary based on design complexity. Contact us for custom quotes.
         </motion.p>
-
-        {serviceType === 'home' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-8 text-center"
-          >
-            <a
-              href="#book-home"
-              className="inline-flex items-center gap-2 bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-8 py-4 hover:bg-gold-300 transition-colors"
-              data-testid="book-home-service-btn"
-            >
-              <Calendar size={18} />
-              Book Home Service
-            </a>
-          </motion.div>
-        )}
       </div>
     </section>
   );
@@ -609,7 +1071,7 @@ const HomeBookingForm = () => {
 
   if (submitted) {
     return (
-      <section id="book-home" className="py-24 md:py-32 px-6 md:px-12 bg-charcoal" data-testid="home-booking-success">
+      <section id="book-home" className="py-20 md:py-28 px-6 md:px-12 bg-obsidian" data-testid="home-booking-success">
         <div className="max-w-2xl mx-auto text-center">
           <motion.div
             initial={{ scale: 0 }}
@@ -618,7 +1080,7 @@ const HomeBookingForm = () => {
           >
             <CheckCircle size={40} className="text-obsidian" />
           </motion.div>
-          <h2 className="font-serif text-3xl text-gold-100 mb-4">Booking Submitted!</h2>
+          <h2 className="font-serif text-3xl text-white mb-4">Booking Submitted!</h2>
           <p className="text-neutral-400 mb-8">
             We've received your home service request. We'll contact you shortly to confirm your appointment.
           </p>
@@ -634,7 +1096,7 @@ const HomeBookingForm = () => {
   }
 
   return (
-    <section id="book-home" className="py-24 md:py-32 px-6 md:px-12 bg-charcoal" data-testid="home-booking-section">
+    <section id="book-home" className="py-20 md:py-28 px-6 md:px-12 bg-obsidian" data-testid="home-booking-section">
       <div className="max-w-3xl mx-auto">
         <motion.div
           initial="hidden"
@@ -643,14 +1105,15 @@ const HomeBookingForm = () => {
           variants={staggerContainer}
           className="text-center mb-12"
         >
-          <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.2em] text-gold-400 mb-4">
-            We Come To You
-          </motion.p>
-          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-gold-100 mb-4">
-            Book Home Service
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <HomeIcon size={16} className="text-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Convenience</span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-white mb-4">
+            Book <span className="text-gold-400">Home Service</span>
           </motion.h2>
           <motion.p variants={fadeInUp} className="text-neutral-400">
-            Fill out the form below and we'll bring the salon experience to your doorstep
+            We bring the luxury salon experience to your doorstep
           </motion.p>
         </motion.div>
 
@@ -660,7 +1123,7 @@ const HomeBookingForm = () => {
           viewport={{ once: true }}
           variants={fadeInUp}
           onSubmit={handleSubmit}
-          className="bg-obsidian border border-white/10 p-8"
+          className="bg-charcoal border border-white/10 p-8"
         >
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 mb-6 text-sm">
@@ -679,7 +1142,7 @@ const HomeBookingForm = () => {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                className="w-full bg-obsidian border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
                 placeholder="Enter your name"
                 data-testid="booking-name-input"
               />
@@ -695,7 +1158,7 @@ const HomeBookingForm = () => {
                 required
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                className="w-full bg-obsidian border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
                 placeholder="e.g., 0805 857 8131"
                 data-testid="booking-phone-input"
               />
@@ -710,7 +1173,7 @@ const HomeBookingForm = () => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                className="w-full bg-obsidian border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
                 placeholder="your@email.com"
                 data-testid="booking-email-input"
               />
@@ -725,7 +1188,7 @@ const HomeBookingForm = () => {
                 required
                 value={formData.service}
                 onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                className="w-full bg-obsidian border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
                 data-testid="booking-service-select"
               >
                 <option value="">Select a service</option>
@@ -746,7 +1209,7 @@ const HomeBookingForm = () => {
                 value={formData.preferred_date}
                 onChange={(e) => setFormData({ ...formData, preferred_date: e.target.value })}
                 min={new Date().toISOString().split('T')[0]}
-                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                className="w-full bg-obsidian border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
                 data-testid="booking-date-input"
               />
             </div>
@@ -760,7 +1223,7 @@ const HomeBookingForm = () => {
                 required
                 value={formData.preferred_time}
                 onChange={(e) => setFormData({ ...formData, preferred_time: e.target.value })}
-                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                className="w-full bg-obsidian border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
                 data-testid="booking-time-select"
               >
                 <option value="">Select time</option>
@@ -779,7 +1242,7 @@ const HomeBookingForm = () => {
                 required
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors min-h-[100px]"
+                className="w-full bg-obsidian border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors min-h-[100px]"
                 placeholder="Enter your full address (street, area, landmark)"
                 data-testid="booking-address-input"
               />
@@ -792,7 +1255,7 @@ const HomeBookingForm = () => {
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="w-full bg-charcoal border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
+                className="w-full bg-obsidian border border-white/10 px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
                 placeholder="Any special requests or details"
                 data-testid="booking-notes-input"
               />
@@ -824,95 +1287,73 @@ const HomeBookingForm = () => {
   );
 };
 
-// Testimonials Section
-const Testimonials = ({ testimonials }) => {
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          trackView('reviews');
-        }
-      },
-      { threshold: 0.3 }
-    );
-    const el = document.getElementById('reviews');
-    if (el) observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
+// Final Conversion Block
+const FinalCTA = () => {
   return (
-    <section id="reviews" className="py-24 md:py-32 bg-charcoal overflow-hidden" data-testid="testimonials-section">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.2em] text-gold-400 mb-4">
-            What Clients Say
-          </motion.p>
-          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-gold-100">
-            Reviews
-          </motion.h2>
-        </motion.div>
+    <section className="py-20 md:py-28 px-6 md:px-12 bg-obsidian relative overflow-hidden" data-testid="final-cta">
+      <div className="absolute inset-0">
+        <img
+          src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=85&w=1920&auto=format&fit=crop"
+          alt="Beauty background"
+          className="w-full h-full object-cover opacity-20"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/90 to-obsidian/80" />
       </div>
-
-      <div className="relative">
-        <div className="testimonial-track">
-          {[...testimonials, ...testimonials].map((testimonial, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 w-[350px] p-6 bg-obsidian border border-white/5"
-              data-testid={`testimonial-${index}`}
-            >
-              <div className="flex gap-1 mb-4">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} size={16} className="fill-gold-400 text-gold-400" />
-                ))}
-              </div>
-              <p className="text-neutral-300 mb-4 italic">"{testimonial.text}"</p>
-              <p className="text-gold-400 font-medium">{testimonial.name}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// Promotions Section
-const Promotions = ({ promotion }) => {
-  if (!promotion) return null;
-
-  return (
-    <section className="py-16 px-6 md:px-12 bg-obsidian" data-testid="promotions-section">
-      <div className="max-w-5xl mx-auto">
+      
+      <div className="max-w-4xl mx-auto text-center relative z-10">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          variants={fadeInUp}
-          className="relative border-2 border-gold-400 p-8 md:p-12 text-center overflow-hidden"
+          variants={staggerContainer}
         >
-          <div className="promo-shimmer absolute inset-0 pointer-events-none" />
-          <Sparkles className="text-gold-400 mx-auto mb-4" size={32} />
-          <h3 className="font-serif text-2xl md:text-4xl text-gold-100 mb-4">
-            {promotion.title}
-          </h3>
-          <p className="text-neutral-300 mb-6 max-w-xl mx-auto">
-            {promotion.description} <span className="text-gold-400 font-bold">{promotion.discount}</span>
-          </p>
-          <a
-            href="https://wa.me/2348058578131?text=Hi!%20I'm%20interested%20in%20the%20special%20offer."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-8 py-4 hover:bg-gold-300 transition-colors duration-300"
-            data-testid="claim-offer-btn"
-          >
-            Claim Offer
-          </a>
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <Sparkles size={16} className="text-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Start Your Journey</span>
+          </motion.div>
+          
+          <motion.h2 variants={fadeInUp} className="font-serif text-4xl md:text-6xl text-white mb-6">
+            Your <span className="text-gold-400">Glow-Up</span> Starts Today
+          </motion.h2>
+          
+          <motion.p variants={fadeInUp} className="text-neutral-400 text-lg max-w-2xl mx-auto mb-10">
+            Join hundreds of satisfied clients who have transformed their look with BeautyBar609. Book your appointment now and experience the difference.
+          </motion.p>
+
+          <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="https://wa.me/2348058578131"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gold-400 text-obsidian font-bold uppercase tracking-wider px-12 py-5 hover:bg-gold-300 transition-colors duration-300 flex items-center justify-center gap-3 text-lg"
+              data-testid="final-book-btn"
+            >
+              <MessageCircle size={24} />
+              Book Now on WhatsApp
+            </a>
+            <a
+              href="tel:+2348058578131"
+              className="border-2 border-gold-400 text-gold-400 hover:bg-gold-400/10 uppercase tracking-wider px-12 py-5 transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <Phone size={20} />
+              Call Us
+            </a>
+          </motion.div>
+
+          <motion.div variants={fadeInUp} className="mt-10 flex items-center justify-center gap-6 text-neutral-500 text-sm">
+            <div className="flex items-center gap-2">
+              <Shield size={16} className="text-gold-400" />
+              <span>Hygiene Certified</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Award size={16} className="text-gold-400" />
+              <span>5+ Years Experience</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Star size={16} className="text-gold-400 fill-gold-400" />
+              <span>500+ Happy Clients</span>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
@@ -943,7 +1384,7 @@ const Contact = () => {
   }, []);
 
   return (
-    <section id="contact" className="py-24 md:py-32 px-6 md:px-12 bg-charcoal" data-testid="contact-section">
+    <section id="contact" className="py-20 md:py-28 px-6 md:px-12 bg-charcoal" data-testid="contact-section">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial="hidden"
@@ -952,11 +1393,12 @@ const Contact = () => {
           variants={staggerContainer}
           className="text-center mb-16"
         >
-          <motion.p variants={fadeInUp} className="text-xs uppercase tracking-[0.2em] text-gold-400 mb-4">
-            Get In Touch
-          </motion.p>
-          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-gold-100">
-            Contact Us
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 bg-gold-400/10 px-4 py-2 mb-6">
+            <MapPin size={16} className="text-gold-400" />
+            <span className="text-xs uppercase tracking-widest text-gold-400">Visit Us</span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} className="font-serif text-3xl md:text-5xl text-white">
+            Get In <span className="text-gold-400">Touch</span>
           </motion.h2>
         </motion.div>
 
@@ -1019,9 +1461,10 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-center md:text-left">
             <img 
-              src="https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/ybuu6n1s_New%20Logo.png" 
+              src="/logo.png" 
               alt="BeautyBar609" 
-              className="h-24 w-auto mx-auto md:mx-0"
+              className="h-20 w-auto mx-auto md:mx-0"
+              onError={(e) => { e.target.src = 'https://customer-assets.emergentagent.com/job_beautybar-preview/artifacts/ybuu6n1s_New%20Logo.png'; }}
             />
           </div>
 
@@ -1075,18 +1518,16 @@ const Home = () => {
   const [homePrices, setHomePrices] = useState([]);
   const [testimonials, setTestimonials] = useState(fallbackTestimonials);
   const [gallery, setGallery] = useState(fallbackGallery);
-  const [promotion, setPromotion] = useState({ title: "Special Offer", description: "Book a full set of nails and lashes together and get your total service discount. Valid for first-time clients!", discount: "15% OFF" });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [servicesRes, salonPricesRes, homePricesRes, testimonialsRes, galleryRes, promotionRes] = await Promise.all([
+        const [servicesRes, salonPricesRes, homePricesRes, testimonialsRes, galleryRes] = await Promise.all([
           axios.get(`${API}/services`).catch(() => ({ data: [] })),
           axios.get(`${API}/prices?service_type=salon`).catch(() => ({ data: [] })),
           axios.get(`${API}/prices?service_type=home`).catch(() => ({ data: [] })),
           axios.get(`${API}/testimonials`).catch(() => ({ data: [] })),
           axios.get(`${API}/gallery`).catch(() => ({ data: [] })),
-          axios.get(`${API}/promotions/active`).catch(() => ({ data: null }))
         ]);
 
         if (servicesRes.data?.length) setServices(servicesRes.data);
@@ -1094,7 +1535,6 @@ const Home = () => {
         if (homePricesRes.data?.length) setHomePrices(homePricesRes.data);
         if (testimonialsRes.data?.length) setTestimonials(testimonialsRes.data);
         if (galleryRes.data?.length) setGallery(galleryRes.data);
-        if (promotionRes.data) setPromotion(promotionRes.data);
       } catch (error) {
         console.log('Using fallback data');
       }
@@ -1108,12 +1548,17 @@ const Home = () => {
     <div className="bg-obsidian min-h-screen" data-testid="home-page">
       <Navigation />
       <Hero />
+      <TrustBuilders />
+      <Transformations />
+      <SignatureMethod />
       <Services services={services} />
+      <ExpertAuthority />
       <Gallery images={gallery} />
+      <Testimonials testimonials={testimonials} />
+      <VIPMembership />
       <Prices salonPrices={salonPrices} homePrices={homePrices.length ? homePrices : salonPrices} />
       <HomeBookingForm />
-      <Testimonials testimonials={testimonials} />
-      <Promotions promotion={promotion} />
+      <FinalCTA />
       <Contact />
       <Footer />
       <WhatsAppFloat />
