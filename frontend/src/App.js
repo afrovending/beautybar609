@@ -770,7 +770,7 @@ const Testimonials = ({ testimonials }) => {
               ))}
             </div>
             <span className="text-white font-bold">5.0</span>
-            <span className="text-neutral-400">on Google Reviews</span>
+            <span className="text-neutral-400">Average Rating</span>
           </motion.div>
         </motion.div>
       </div>
